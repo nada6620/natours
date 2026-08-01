@@ -1,0 +1,68 @@
+const { json } = require("express");
+
+class APIFeatureas{
+    constructor(query,queryString){
+        this.query=query;
+        this.queryString=queryString
+    }
+
+    filter(){
+         const queryObj = { ...this.queryString };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach(el => delete queryObj[el]);
+
+    //# 2) Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+    this.query=this.query.find(JSON.parse(queryStr));
+
+    return this ;
+    }
+
+    sort(){
+           if ( this.queryString.sort) {
+      // تحويل الفواصل إلى مسافات للـ Mongoose
+      // const sortBy = this.queryString.sort.split(',').join(' ');
+      // التأكد من أن sort نص، وإذا كانت مصفوفة يتم تحويلها أو التعامل معها
+const sortBy = typeof this.queryString.sort === 'string' 
+  ? this.queryString.sort.split(',').join(' ') 
+  : this.queryString.sort.toString();
+  
+      this.query = this.query.sort(sortBy);
+    } else {
+      this.query = this.query.sort('-createdAt'); // الترتيب الافتراضي
+    }
+
+    return this;
+    }
+
+    limitFields(){
+          if (this.queryString.fields) {
+      const fields = this.queryString.fields.split(',').join(' ');
+      this.query = this.query.select(fields);
+    } else {
+      this.query = this.query.select('-__v'); // إخفاء حقل الـ __v الافتراضي
+    }
+
+    return this;
+    }
+ 
+    pagination(){
+            const page = this.queryString.page * 1 || 1;
+    const limit = this.queryString.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    this.query = this.query.skip(skip).limit(limit);
+
+    // if (this.queryString.page) {
+    //   const numTours = await TourSchema.countDocuments();
+    //   if (skip >= numTours) throw new Error('This page does not exist');
+    // }
+    return this ;
+    }
+
+
+}
+
+module.exports=APIFeatureas;

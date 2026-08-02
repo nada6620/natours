@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const globalErrorHandler=require('./Controllers/errorController')
 const APPError =require('./Utils/appError')
 const cookieParser= require('cookie-parser');
+const compression = require('compression')
 const app = express();
 
 // pug=> make server built html templates
@@ -128,6 +129,7 @@ app.use('/api',limiter)
 
 app.use(express.static(path.join(__dirname,'public')));
 
+app.use(compression())
 
 // add new property to request
 app.use((req, res, next) => {

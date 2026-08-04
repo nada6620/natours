@@ -5,6 +5,7 @@ const globalErrorHandler=require('./Controllers/errorController')
 const APPError =require('./Utils/appError')
 const cookieParser= require('cookie-parser');
 const compression = require('compression')
+const cors = require('cors')
 const app = express();
 
 // pug=> make server built html templates
@@ -18,6 +19,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp')
 ///Middleware ///
+
+
 
 // for set security http method
 app.use(
@@ -110,6 +113,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 // access cookie with every request
 app.use(cookieParser())
+
+app.use(cors())
+
+ 
+
 
 if(process.env.NODE_ENV === 'development'){
    app.use( morgan('dev') );

@@ -7,6 +7,7 @@ const cookieParser= require('cookie-parser');
 const compression = require('compression')
 const cors = require('cors')
 const app = express();
+app.set('trust proxy', 1);
 
 // pug=> make server built html templates
 app.set('view engine','pug')

@@ -15,34 +15,68 @@ process.on('uncaughtException',err=>{
 
 const DB = process.env.MONGODB_URI.replace('<db_password>', process.env.MONGODB_PASSWORD);
  
+let isConnected = false;
 
-mongoose
-  .connect(DB)
-  .then(() => {
+const connectDB = async () => {
+  if (isConnected || mongoose.connection.readyState === 1) {
+    isConnected = true;
+    return;
+  }
+  try {
+    await mongoose.connect(DB);
+    isConnected = true;
     console.log('DB connection successful! 😍 🪢');
-  });
+  } catch (err) {
+    console.error('DB connection error 💥:', err);
+  }
+};
 
-// 4) Start server
-const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log(`App running on port ${port}...`);
+// Middleware يضمن عدم تنفيذ أي Route إلا بعد تمام الاتصال بالداتابيز
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
 });
 
+// mongoose
+//   .connect(DB)
+//   .then(() => {
+//     console.log('DB connection successful! 😍 🪢');
+//   });
+
+// 4) Start server
+// const port = process.env.PORT || 3000;
+// const server = app.listen(port, () => {
+//   console.log(`App running on port ${port}...`);
+// });
+
+let server;
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 3000;
+  server = app.listen(port, () => {
+    console.log(`App running on port ${port}...`);
+  });
+}
+
 // unhandledRejection error  => فانكشن بتهندل الايرور اللي بتيجي من السيستم نفسه يعني مثلا حصل مشكله في connect moongoDB
-process.on('unhandledRejection',err=>{
+process.on('unhandledRejection', err => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.log(err.name,err.message);
-  // server.close => عشان لو عندي اكتر من يوزر كانو بيعملو ريكوست في نفس الوقت اللي السيستم وقع فيه فعشان ميخسرهمش 
-  // متستقبلش Requests جديدة، لكن خلص الـ Requests الحالية الأول.
-  server.close(()=>{
+  console.log(err.name, err.message);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
     process.exit(1);
-  })
-})
+  }
+});
 
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+  if (server) {
+    server.close(() => {
+      console.log('💥 Process terminated!');
+    });
+  }
+});
 
-process.on('SIGTERM',()=>{
-  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully')
-  server.close(()=>{
-    console.log('💥 Process terminated!');
-  })
-})
+module.exports=app

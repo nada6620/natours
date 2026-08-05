@@ -16,11 +16,20 @@ process.on('uncaughtException',err=>{
 const DB = process.env.MONGODB_URI.replace('<db_password>', process.env.MONGODB_PASSWORD);
  
 
+// mongoose
+//   .connect(DB)
+//   .then(() => {
+//     console.log('DB connection successful!😍 🪢');
+//   })
+
 mongoose
   .connect(DB)
   .then(() => {
     console.log('DB connection successful!😍 🪢');
   })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+  });
 
 
 const port = process.env.PORT || 3000;

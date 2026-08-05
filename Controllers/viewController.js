@@ -8,9 +8,11 @@ exports.getOverview = catchAsync(async (req,res)=>{
   console.log('Inside getOverview:', res.locals.user);
   // 1- get all tours 
   // const tours = await Tour.find();
- console.log('Before Tour.find()');
+ 
 const tours = await Tour.find();
-console.log('After Tour.find()');
+ console.log('--- START DATES STRUCTURE ---');
+  console.log(JSON.stringify(tours[0].startDates, null, 2));
+  
   res.status(200).render('overview',{
     title:'All Tours',
     // 2- send tour data to templet 

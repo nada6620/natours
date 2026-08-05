@@ -7,7 +7,10 @@ const AppError = require('../Utils/appError');
 exports.getOverview = catchAsync(async (req,res)=>{
   console.log('Inside getOverview:', res.locals.user);
   // 1- get all tours 
-  const tours = await Tour.find();
+  // const tours = await Tour.find();
+ console.log('Before Tour.find()');
+const tours = await Tour.find();
+console.log('After Tour.find()');
   res.status(200).render('overview',{
     title:'All Tours',
     // 2- send tour data to templet 

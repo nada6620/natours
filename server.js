@@ -72,8 +72,11 @@ const DB = process.env.MONGODB_URI.replace('<db_password>', process.env.MONGODB_
       console.log(`App running on port ${port}`);
     });
   } catch (err) {
-    console.error(err);
-  }
+  console.error('====== MONGOOSE ERROR ======');
+  console.error(err.name);
+  console.error(err.message);
+  console.error(err.stack);
+}
 })();
 
 // unhandledRejection error  => فانكشن بتهندل الايرور اللي بتيجي من السيستم نفسه يعني مثلا حصل مشكله في connect moongoDB

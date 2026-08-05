@@ -16,27 +16,65 @@ process.on('uncaughtException',err=>{
 const DB = process.env.MONGODB_URI.replace('<db_password>', process.env.MONGODB_PASSWORD);
  
 
+// // mongoose
+// //   .connect(DB)
+// //   .then(() => {
+// //     console.log('DB connection successful!😍 🪢');
+// //   })
+
 // mongoose
 //   .connect(DB)
 //   .then(() => {
-//     console.log('DB connection successful!😍 🪢');
+//     console.log("DB connected");
+//     console.log(mongoose.connection.readyState);
+//     console.log(mongoose.connection.host);
+//     console.log(mongoose.connection.name);
 //   })
+//   .catch(err => {
+//     console.error(err);
+//   });
+// console.log("NODE_ENV =", process.env.NODE_ENV);
+// console.log("URI =", process.env.MONGODB_URI);
+// console.log("Password exists =", !!process.env.MONGODB_PASSWORD); 
 
-mongoose
-  .connect(DB)
-  .then(() => {
-    console.log('DB connection successful!😍 🪢');
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-  });
+// mongoose.connection.on('connected', () => {
+//   console.log('Connected');
+// });
+
+// mongoose.connection.on('error', err => {
+//   console.log('Mongo Error:', err);
+// });
+
+// mongoose.connection.on('disconnected', () => {
+//   console.log('Disconnected');
+// });
 
 
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT || 3000;
 
-const server = app.listen(port, () => {
-  console.log(`App running on port ${port}`);
-});
+// const server = app.listen(port, () => {
+//   console.log(`App running on port ${port}`);
+// });
+
+
+(async () => {
+  try {
+    await mongoose.connect(DB);
+
+    console.log('Connected!');
+    console.log('readyState =', mongoose.connection.readyState);
+
+    const app = require('./app');
+
+    const port = process.env.PORT || 3000;
+
+    app.listen(port, () => {
+      console.log(`App running on port ${port}`);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+})();
 
 // unhandledRejection error  => فانكشن بتهندل الايرور اللي بتيجي من السيستم نفسه يعني مثلا حصل مشكله في connect moongoDB
 process.on('unhandledRejection',err=>{

@@ -4,7 +4,7 @@ const Booking = require('../Models/bookingModel')
 const catchAsync = require('../Utils/catchAsync')
 const AppError = require('../Utils/appError');
 
-exports.alerts = catchAsync(async (req,res)=>{
+exports.alerts = catchAsync(async (req,res,next)=>{
   const {alert} = req.query;
   if(alert==='booking')
     res.locals.alert = "Your booking was successful! Please check your email for a confirmation doesn't show up here immediatly, Please come back later. "

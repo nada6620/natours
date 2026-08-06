@@ -69,20 +69,50 @@ await Booking.create({
 });
 }
 
-exports.webhookCheckout = catchAsync (async (req, res,next) => {
-const signature = req.headers['stripe-signature'];
-let event ;
-try{
-   event=stripe.webhooks.constructEvent(req.body,signature,process.env.STRIPE_WEBHOOK_SECRET)
-}catch(err){
- return res.status(400).send(`Webhook error: ${err.message}`);
-}
+// exports.webhookCheckout = catchAsync (async (req, res,next) => {
+// const signature = req.headers['stripe-signature'];
+// let event ;
+// try{
+//    event=stripe.webhooks.constructEvent(req.body,signature,process.env.STRIPE_WEBHOOK_SECRET)
+// }catch(err){
+//  return res.status(400).send(`Webhook error: ${err.message}`);
+// }
 
-if(event.type==='checkout.session.completed'){
-    await createBookingCheckout(event.data.object);
-}
-res.status(200).json({received: true})
-});
+// if(event.type==='checkout.session.completed'){
+//     await createBookingCheckout(event.data.object);
+// }
+// res.status(200).json({received: true})
+// });
+
+exports.webhookCheckout = async (req, res) => {
+  console.log('========== WEBHOOK ==========');
+  console.log('Content-Type:', req.headers['content-type']);
+  console.log('Stripe Signature exists:', !!req.headers['stripe-signature']);
+  console.log('Body is Buffer:', Buffer.isBuffer(req.body));
+  console.log(
+    'Webhook Secret:',
+    process.env.STRIPE_WEBHOOK_SECRET
+      ? process.env.STRIPE_WEBHOOK_SECRET.substring(0, 12)
+      : 'undefined'
+  );
+
+  const signature = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send(`Webhook error: ${err.message}`);
+  }
+
+  console.log('Webhook verified successfully');
+};
 
 exports.createBooking = factory.createOne(Booking)
 exports.getBooking = factory.getOne(Booking)

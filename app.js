@@ -4,7 +4,6 @@ const morgan = require('morgan');
 const globalErrorHandler=require('./Controllers/errorController')
 const APPError =require('./Utils/appError')
 const cookieParser= require('cookie-parser');
-const bodyParser = require('body-parser')
 const compression = require('compression')
 const cors = require('cors')
 const app = express();

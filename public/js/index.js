@@ -5,6 +5,9 @@ import { dispalyMap } from './mapBox';
 import {updateSettings} from './updateSetting'
 
 import { bookTour } from './stripe';
+
+ import { showAlert } from './alerts';
+
 // Dom element 
  
 const loginForm = document.querySelector('.form--login');
@@ -73,3 +76,6 @@ if(logoutButton) logoutButton.addEventListener('click',logout)
   const {tourId} = e.target.dataset;
   bookTour(tourId)
   })
+
+  const alertMessage = document.querySelector('body').dataset.alert
+  if(alert) showAlert('success',alertMessage,20) 

@@ -4,7 +4,7 @@ const viewController = require('../Controllers/viewController')
 const authController = require('../Controllers/authController')
 const bookingController = require('../Controllers/bookingController')
 
- 
+router.use(viewController.alerts)
 
 router.get('/',
     // bookingController.createBookingCheckout,

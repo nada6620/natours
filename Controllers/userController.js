@@ -5,6 +5,7 @@ const factory = require('./handlerFactory')
 const multer = require('multer');
 const sharp = require('sharp');
 
+
 // 1- determine where photo is saved
 // const multerStorage = multer.diskStorage({
 //   // a- place , file 
@@ -20,7 +21,7 @@ const sharp = require('sharp');
 // })
 
 const multerStorage = multer.memoryStorage();
-
+ 
 //2- ensure the data is a photo or not before save it 
 
 const multerFilter = (req,file,cb)=>{

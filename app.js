@@ -4,11 +4,13 @@ const morgan = require('morgan');
 const globalErrorHandler=require('./Controllers/errorController')
 const APPError =require('./Utils/appError')
 const cookieParser= require('cookie-parser');
+const bodyParser = require('body-parser')
 const compression = require('compression')
 const cors = require('cors')
 const app = express();
 app.set('trust proxy', 1);
 
+const bookingController = require('./Controllers/bookingController')
 // pug=> make server built html templates
 app.set('view engine','pug')
 app.set('views',path.join(__dirname,'views'))
@@ -108,6 +110,8 @@ app.use(
 
 app.set('query parser', 'extended');
 
+app.post('/webhook-checkout',express.raw({type:'application/json'}),bookingController.webhookHeckout)
+
 // Middleware that parses incoming JSON data and makes it available in req.body
 app.use(express.json());
 // to read HTML Form data , convert to js
@@ -132,7 +136,6 @@ const limiter = ratelimit({
 })
 app.use('/api',limiter)
 
- 
 
 
 

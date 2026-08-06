@@ -6,7 +6,10 @@ const bookingController = require('../Controllers/bookingController')
 
  
 
-router.get('/',bookingController.createBookingCheckout,authController.isLoggedIn,viewController.getOverview)
+router.get('/',
+    // bookingController.createBookingCheckout,
+    authController.isLoggedIn,
+    viewController.getOverview)
 
 router.get('/tours/:slug',authController.isLoggedIn,viewController.getTour)
 

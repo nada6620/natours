@@ -110,7 +110,7 @@ app.use(
 
 app.set('query parser', 'extended');
 
-app.post('/webhook-checkout',express.raw({type:'application/json'}),bookingController.webhookHeckout)
+app.post('/webhook-checkout',express.raw({type:'application/json'}),bookingController.webhookCheckout)
 
 // Middleware that parses incoming JSON data and makes it available in req.body
 app.use(express.json());

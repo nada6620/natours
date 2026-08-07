@@ -1,4 +1,4 @@
-import{login,logout} from './login';
+import{login,logout,signup} from './login';
  
 import { dispalyMap } from './mapBox';
 
@@ -11,6 +11,7 @@ import { bookTour } from './stripe';
 // Dom element 
  
 const loginForm = document.querySelector('.form--login');
+const signupForm = document.querySelector('.form--signup');
 const mapBox = document.getElementById('map');
 const logoutButton = document.querySelector('.nav__el--logout');
 
@@ -33,6 +34,19 @@ if (mapBox) {
     const email = document.getElementById('email').value ;
     const password = document.getElementById('password').value ;
     login(email,password)
+})
+
+console.log("signup form : ",signupForm);
+if(signupForm)
+  signupForm.addEventListener('submit',e=>{
+    e.preventDefault()
+    console.log('submitted');
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm =document.getElementById('passwordConfirm').value;
+
+    signup(name,email,password,passwordConfirm);
 })
   
 if(logoutButton) logoutButton.addEventListener('click',logout)

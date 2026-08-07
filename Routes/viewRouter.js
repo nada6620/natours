@@ -13,7 +13,10 @@ router.get('/',
 
 router.get('/tours/:slug',authController.isLoggedIn,viewController.getTour)
 
+router.get('/signUp',viewController.getSignupForm);
 router.get('/login',authController.isLoggedIn,viewController.getLoginForm);
+
+
 
 router.get('/me',authController.protect,viewController.getAccount);
 

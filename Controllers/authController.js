@@ -14,17 +14,14 @@ const signToken = id=>{
 }
 
 const createSendToken =(user,statusCode,res)=>{
-    const token = signToken(user._id);
+ const token = signToken(user._id);
 
-    const cookieOptions = {
-        expires : new Date(
-            Date.now()+process.env.JWT_COOKIE_EXPIRES_IN*24*60*60*1000
-        ),
-        httpOnly:true
-    }
-
-    if(process.env.NODE_ENV==='production') cookieOptions.secure=true;
-
+const cookieOptions = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    sameSite: 'lax',
+};
     res.cookie('jwt',token,cookieOptions)
 
     // remove password from the output
@@ -85,15 +82,14 @@ exports.login=catchAsync(async(req,res,next)=>{
 
 })
 
-exports.logOut = (req,res)=>{
-    res.cookie('jwt','logOut',{
-        expires : new Date(Date.now() + 10 * 1000),
-        httpOnly:true
-    })
-    res.status(200).json({
-        status:'success'
-    })
-}
+exports.logOut = (req, res) => {
+    res.cookie('jwt', 'logOut', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+    });
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.status(200).json({ status: 'success' });
+};
 
 exports.protect=catchAsync(async (req,res,next)=>{
 // 1- check if token is exist and get it 

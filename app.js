@@ -22,7 +22,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp')
 ///Middleware ///
 
-
+app.set('trust proxy', 1);
 
 // for set security http method
 app.use(

@@ -55,7 +55,7 @@ console.log(url);
 
 // create new token when signup
 
-createSendToken(newUser,200,res)
+createSendToken(newUser,200,req,res)
 })
 
 exports.login=catchAsync(async(req,res,next)=>{
@@ -78,7 +78,7 @@ exports.login=catchAsync(async(req,res,next)=>{
 
     // 3- if everything ok , send token to client 
 
-    createSendToken(user,200,res)
+    createSendToken(user,200,req,res)
 
 })
 
@@ -228,7 +228,7 @@ exports.resetPassword = catchAsync(async (req,res,next)=>{
     // 3- after save updated password , we check if password is modified Update changedPasswordAt
    await user.save();
    // 4- generate token and res
-     createSendToken(user,200,res)
+     createSendToken(user,200,req,res)
 
 });
 
@@ -249,5 +249,5 @@ exports.updatePassword =  catchAsync(async (req,res,next)=>{
  
    await user.save();
     // 4- generate token 
-  createSendToken(user,200,res) 
+  createSendToken(user,200,req,res) 
 })

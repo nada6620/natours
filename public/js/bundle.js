@@ -7219,7 +7219,7 @@ const signup = async (name, email, password, passwordConfirm) => {
   }
 };
 exports.signup = signup;
-const logout = async () => {
+const logout = async e => {
   e.preventDefault();
   try {
     const res = await (0, _axios.default)({

@@ -49,7 +49,7 @@
      }
  }
 
- export const logout = async ()=>{
+ export const logout = async (e)=>{
       e.preventDefault();
     try{
     const res = await axios({

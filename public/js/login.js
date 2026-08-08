@@ -50,6 +50,7 @@
  }
 
  export const logout = async ()=>{
+      e.preventDefault();
     try{
     const res = await axios({
         method:'GET',

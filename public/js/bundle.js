@@ -7220,6 +7220,7 @@ const signup = async (name, email, password, passwordConfirm) => {
 };
 exports.signup = signup;
 const logout = async () => {
+  e.preventDefault();
   try {
     const res = await (0, _axios.default)({
       method: 'GET',
@@ -7370,6 +7371,7 @@ if (signupForm) signupForm.addEventListener('submit', e => {
   const passwordConfirm = document.getElementById('passwordConfirm').value;
   (0, _login.signup)(name, email, password, passwordConfirm);
 });
+console.log('Logout button:', logoutButton);
 if (logoutButton) logoutButton.addEventListener('click', _login.logout);
 if (userDataForm) userDataForm.addEventListener('submit', e => {
   e.preventDefault();
@@ -7434,7 +7436,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64657" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57766" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

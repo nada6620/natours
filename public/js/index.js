@@ -48,7 +48,7 @@ if(signupForm)
 
     signup(name,email,password,passwordConfirm);
 })
-  
+  console.log('Logout button:', logoutButton);
 if(logoutButton) logoutButton.addEventListener('click',logout)
 
 

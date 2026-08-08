@@ -7218,17 +7218,39 @@ const signup = async (name, email, password, passwordConfirm) => {
     (0, _alerts.showAlert)('error', ((_err$response2 = err.response) === null || _err$response2 === void 0 || (_err$response2 = _err$response2.data) === null || _err$response2 === void 0 ? void 0 : _err$response2.message) || err.message);
   }
 };
+
+//  export const logout = async (e)=>{
+//       e.preventDefault();
+//     try{
+//     const res = await axios({
+//         method:'GET',
+//         url:'/api/v1/users/logout'
+//      })
+//      if ((res.data.status === 'success')) location.reload(true);
+//     }catch(err){
+//     showAlert(
+//     'error',
+//     err.response?.data?.message || err.message
+//   );
+//     }
+//  }
 exports.signup = signup;
 const logout = async e => {
+  console.log('🔥 INSIDE LOGOUT');
   e.preventDefault();
   try {
+    console.log('🔥 ABOUT TO SEND REQUEST');
     const res = await (0, _axios.default)({
       method: 'GET',
       url: '/api/v1/users/logout'
     });
-    if (res.data.status === 'success') location.reload(true);
+    console.log('🔥 RESPONSE:', res.data);
+    if (res.data.status === 'success') {
+      location.reload(true);
+    }
   } catch (err) {
     var _err$response3;
+    console.log('🔥 LOGOUT ERROR:', err);
     (0, _alerts.showAlert)('error', ((_err$response3 = err.response) === null || _err$response3 === void 0 || (_err$response3 = _err$response3.data) === null || _err$response3 === void 0 ? void 0 : _err$response3.message) || err.message);
   }
 };
@@ -7371,8 +7393,16 @@ if (signupForm) signupForm.addEventListener('submit', e => {
   const passwordConfirm = document.getElementById('passwordConfirm').value;
   (0, _login.signup)(name, email, password, passwordConfirm);
 });
+
+// if(logoutButton) logoutButton.addEventListener('click',logout)
+
 console.log('Logout button:', logoutButton);
-if (logoutButton) logoutButton.addEventListener('click', _login.logout);
+if (logoutButton) {
+  logoutButton.addEventListener('click', e => {
+    console.log('🔥 LOGOUT CLICKED');
+    (0, _login.logout)(e);
+  });
+}
 if (userDataForm) userDataForm.addEventListener('submit', e => {
   e.preventDefault();
   const form = new FormData();

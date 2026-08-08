@@ -48,9 +48,18 @@ if(signupForm)
 
     signup(name,email,password,passwordConfirm);
 })
-  console.log('Logout button:', logoutButton);
-if(logoutButton) logoutButton.addEventListener('click',logout)
+ 
+// if(logoutButton) logoutButton.addEventListener('click',logout)
+ 
 
+console.log('Logout button:', logoutButton);
+
+if (logoutButton) {
+  logoutButton.addEventListener('click', (e) => {
+    console.log('🔥 LOGOUT CLICKED');
+    logout(e);
+  });
+}
 
   if(userDataForm) 
     userDataForm.addEventListener('submit',e=>{

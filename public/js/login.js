@@ -49,20 +49,48 @@
      }
  }
 
- export const logout = async (e)=>{
-      e.preventDefault();
-    try{
-    const res = await axios({
-        method:'GET',
-        url:'/api/v1/users/logout'
-     })
-     if ((res.data.status === 'success')) location.reload(true);
-    }catch(err){
-    showAlert(
-    'error',
-    err.response?.data?.message || err.message
-  );
-    }
- }
+//  export const logout = async (e)=>{
+//       e.preventDefault();
+//     try{
+//     const res = await axios({
+//         method:'GET',
+//         url:'/api/v1/users/logout'
+//      })
+//      if ((res.data.status === 'success')) location.reload(true);
+//     }catch(err){
+//     showAlert(
+//     'error',
+//     err.response?.data?.message || err.message
+//   );
+//     }
+//  }
 
+
+export const logout = async (e) => {
+  console.log('🔥 INSIDE LOGOUT');
+
+  e.preventDefault();
+
+  try {
+    console.log('🔥 ABOUT TO SEND REQUEST');
+
+    const res = await axios({
+      method: 'GET',
+      url: '/api/v1/users/logout'
+    });
+
+    console.log('🔥 RESPONSE:', res.data);
+
+    if (res.data.status === 'success') {
+      location.reload(true);
+    }
+  } catch (err) {
+    console.log('🔥 LOGOUT ERROR:', err);
+
+    showAlert(
+      'error',
+      err.response?.data?.message || err.message
+    );
+  }
+};
 

@@ -4,7 +4,7 @@ const appError=require('../Utils/appError')
 const factory = require('./handlerFactory')
 const multer = require('multer');
 const sharp = require('sharp');
-
+const cloudinary = require('cloudinary').v2;
 
 // 1- determine where photo is saved
 // const multerStorage = multer.diskStorage({
@@ -19,6 +19,13 @@ const sharp = require('sharp');
 //     cb(null,`user-${req.user.id}-${Date.now()}.${ext}`);
 //   }
 // })
+
+cloudinary.config({
+  cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:process.env.CLOUDINARY_API_KEY,
+  api_secret:process.env.CLOUDINARY_API_SECRET
+});
+
 
 const multerStorage = multer.memoryStorage();
  
@@ -39,16 +46,26 @@ const upload = multer({
 const uploadUserPhoto = upload.single('photo');
 
 const resizeUserPhoto = async (req,res,next)=>{
-  console.log('resizeUserPhoto');
-  console.log(req.file);
+
   if(!req.file) return next()
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
+
+  req.file.filename = `user-${req.user.id}-${Date.now()}`;
+  const buffer= await sharp(req.file.buffer)
   .resize(500,500)
   .toFormat('jpeg')
   .jpeg({quality:90})
-  .toFile(`public/img/users/${req.file.filename}`);
+  // .toFile(`public/img/users/${req.file.filename}`);
+  .toBuffer();
 
+  const result = await new Promise((resolve,reject)=>{
+    const stream = cloudinary.uploader.upload_stream({
+      folder:'natours/users',public_id:req.file.filename,format :'jpeg'},
+    (error, result) => (error ? reject(error) : resolve(result))
+  );
+  stream.end(buffer);
+  })
+
+  req.file.filename =result.secure_url;
   next();
 }
 
@@ -79,11 +96,6 @@ next()
 });
 
 const updateMe =catchAsync(async(req, res,next) => {
-   console.log(req.file);
-   console.log(req.body);
-
-
-
   // 1- throw error if update password
   if(req.body.password||req.body.passwordConfirm){
     return next(new appError('This route not for password updates , please use /updatePassword'))

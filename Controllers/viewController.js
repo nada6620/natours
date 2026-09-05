@@ -99,10 +99,10 @@ exports.getMyTours= catchAsync(async(req,res,next)=>{
 exports.getMyReviews= catchAsync(async(req,res,next)=>{
 
   // get all reviews of the user
-  const reviews = await Review.find({user:req.user.id}).populate({
-  path: 'tour',
-  select: 'name imageCover'
-});
+const reviews = await Review.find({ user: req.user.id })
+  .populate('tour', 'name imageCover')
+  .populate('user', 'name photo');
+  
      res.status(200).render('accountReviews',{
     title:'My Reviews',
  

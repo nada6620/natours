@@ -7355,7 +7355,38 @@ const bookTour = async tourId => {
   }
 };
 exports.bookTour = bookTour;
-},{"./alerts":"alerts.js","axios":"../../node_modules/axios/index.js"}],"index.js":[function(require,module,exports) {
+},{"./alerts":"alerts.js","axios":"../../node_modules/axios/index.js"}],"reviewForm.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createReview = void 0;
+var _axios = _interopRequireDefault(require("axios"));
+var _alerts = require("./alerts");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const createReview = async (tourId, review, rating) => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'POST',
+      url: "/api/v1/tours/".concat(tourId, "/reviews"),
+      data: {
+        review,
+        rating
+      }
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Review submitted successfully!');
+      window.setTimeout(() => {
+        location.reload();
+      }, 1500);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message || 'Something went wrong!');
+  }
+};
+exports.createReview = createReview;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _login = require("./login");
@@ -7363,12 +7394,14 @@ var _mapBox = require("./mapBox");
 var _updateSetting = require("./updateSetting");
 var _stripe = require("./stripe");
 var _alerts = require("./alerts");
+var _reviewForm = require("./reviewForm");
 // Dom element 
 
 const loginForm = document.querySelector('.form--login');
 const signupForm = document.querySelector('.form--signup');
 const mapBox = document.getElementById('map');
 const logoutButton = document.querySelector('.nav__el--logout');
+const reviewForm = document.querySelector('.form--review');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
@@ -7441,7 +7474,16 @@ if (bookBtn) bookBtn.addEventListener('click', e => {
 const alertMessage = document.querySelector('body').dataset.alert;
 console.log('typeof =', typeof alertMessage);
 if (alertMessage) (0, _alerts.showAlert)('success', alertMessage, 20);
-},{"./login":"login.js","./mapBox":"mapBox.js","./updateSetting":"updateSetting.js","./stripe":"stripe.js","./alerts":"alerts.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+if (reviewForm) {
+  reviewForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const review = document.getElementById('review').value;
+    const rating = document.getElementById('rating').value;
+    const tourId = reviewForm.dataset.tourId;
+    (0, _reviewForm.createReview)(tourId, review, rating);
+  });
+}
+},{"./login":"login.js","./mapBox":"mapBox.js","./updateSetting":"updateSetting.js","./stripe":"stripe.js","./alerts":"alerts.js","./reviewForm":"reviewForm.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -7466,7 +7508,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56239" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52599" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

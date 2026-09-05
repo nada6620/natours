@@ -1412,3 +1412,64 @@ body {
   width: 100%;
   height: 100%;
 }
+
+.search-form {
+  display: flex;
+  align-items: center;
+  width: 250px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50px;
+  padding: 0 25px 0 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.search__field {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: #555;
+}
+
+.search__field::placeholder {
+  color: #777;
+}
+
+.search__btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #20a8d8;
+  font-size: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reviews__tour-tag {
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #55c57a;
+  margin-bottom: 1.5rem;
+}
+
+.user-view {
+  display: flex;
+  min-width: 0;
+}
+
+.user-view__content {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.reviews {
+  width: 100%;
+  overflow-x: auto;
+  min-width: 0;
+}

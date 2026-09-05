@@ -1,6 +1,7 @@
 const Tour = require('../Models/touerModel');
 const User = require('../Models/userModel')
 const Booking = require('../Models/bookingModel')
+const Review = require('../Models/reviewModel')
 const catchAsync = require('../Utils/catchAsync')
 const AppError = require('../Utils/appError');
 
@@ -87,9 +88,24 @@ exports.getMyTours= catchAsync(async(req,res,next)=>{
   const tourIds = bookings.map(el=>el.tour);
   const tours = await Tour.find({_id:{$in:tourIds}});
 
-    res.status(200).render('overview',{
+    res.status(200).render('myTours',{
     title:'My Tours',
     // 2- send tour data to templet 
     tours
+  })
+});
+
+
+exports.getMyReviews= catchAsync(async(req,res,next)=>{
+
+  // get all reviews of the user
+  const reviews = await Review.find({user:req.user.id}).populate({
+  path: 'tour',
+  select: 'name imageCover'
+});
+     res.status(200).render('accountReviews',{
+    title:'My Reviews',
+ 
+    reviews
   })
 });

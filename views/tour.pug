@@ -89,7 +89,30 @@ block content
       .reviews
         each review in tour.Review
          +reviewCard(review)
-
+   //- قسم إضافة Review جديدة
+   if user
+      section.section-add-review
+         .login-form
+            h2.heading-secondary.ma-bt-lg Leave your review
+            form.form.form--review(data-tour-id=`${tour.id}`)
+               .form__group
+                  label.form__label(for='rating') Rating (1 to 5)
+                  input#rating.form__input(
+                     type='number', 
+                     min='1', 
+                     max='5', 
+                     placeholder='5', 
+                     required
+                  )
+               .form__group.ma-bt-md
+                  label.form__label(for='review') Review Comment
+                  textarea#review.form__input(
+                     placeholder='Write your review here...', 
+                     required, 
+                     rows='3'
+                  )
+               .form__group
+                  button.btn.btn--green Submit review
 
    section.section-cta
       .cta

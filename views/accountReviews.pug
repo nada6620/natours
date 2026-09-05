@@ -1,0 +1,52 @@
+extends base
+
+mixin navItem(link, text, icon, active)
+   li(class=`${active?'side-nav--active':''}`)
+      a(href=`${link}`)
+         svg
+            use(xlink:href=`/img/icons.svg#icon-${icon}`)
+         | #{text}
+
+mixin accountReviewCard(review)
+   .reviews__card
+      if review.tour
+         span.reviews__tour-tag= review.tour.name
+
+      .reviews__avatar
+         img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.name}`)
+         h6.reviews__user= review.user.name
+
+      p.reviews__text= review.review
+
+      .reviews__rating
+         each star in [1,2,3,4,5]
+            svg.reviews__star(class=`reviews__star--${review.rating>=star?'active':'inactive'}`)
+               use(xlink:href='/img/icons.svg#icon-star')
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        ul.side-nav
+          +navItem('/me', 'Settings', 'settings', false)
+          +navItem('/my-tours', 'My bookings', 'briefcase', false)
+          +navItem('/my-reviews', 'My reviews', 'star', true)
+
+        - if(user.role === 'admin')
+            .admin-nav
+              h5.admin-nav__heading Admin
+              ul.side-nav
+                +navItem('#', 'Manage tours', 'map', false)
+                +navItem('#', 'Manage users', 'users', false)
+                +navItem('#', 'Manage reviews', 'star', false)
+                +navItem('#', 'Manage bookings', 'briefcase', false)
+
+      .user-view__content(style='max-width: 100%; padding-left: 4rem; padding-right: 4rem;')
+        h2.heading-secondary.ma-bt-md My Reviews
+
+        if reviews.length === 0
+          p.error__msg You haven't written any reviews yet!
+        else
+          .reviews
+            each review in reviews
+              +accountReviewCard(review)

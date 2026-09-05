@@ -8,12 +8,17 @@ import { bookTour } from './stripe';
 
  import { showAlert } from './alerts';
 
+ import { createReview } from './reviewForm';
+
+
+
 // Dom element 
  
 const loginForm = document.querySelector('.form--login');
 const signupForm = document.querySelector('.form--signup');
 const mapBox = document.getElementById('map');
 const logoutButton = document.querySelector('.nav__el--logout');
+const reviewForm = document.querySelector('.form--review');
 
 const userDataForm = document.querySelector('.form-user-data')
 const userPasswordForm = document.querySelector('.form-user-password')
@@ -103,3 +108,14 @@ if (logoutButton) {
   const alertMessage = document.querySelector('body').dataset.alert
   console.log('typeof =', typeof alertMessage);
   if(alertMessage) showAlert('success',alertMessage,20) 
+
+    if (reviewForm) {
+  reviewForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const review = document.getElementById('review').value;
+    const rating = document.getElementById('rating').value;
+    const tourId = reviewForm.dataset.tourId; 
+
+    createReview(tourId, review, rating);
+  });
+}

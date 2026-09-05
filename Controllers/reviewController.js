@@ -10,6 +10,8 @@ const Booking = require('../Models/bookingModel')
 exports.setTourUserIds = (req,res,next)=>{
     if(!req.body.tour) req.body.tour = req.params.tourid;
     if(!req.body.user) req.body.user = req.user.id;
+
+    
     next()
 }
 

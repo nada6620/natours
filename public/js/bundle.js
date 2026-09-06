@@ -7267,10 +7267,11 @@ exports.dispalyMap = void 0;
 const dispalyMap = locations => {
   let map = new mapboxgl.Map({
     accessToken: 'pk.eyJ1IjoibmFkYS1heW1hbjYyIiwiYSI6ImNtcnQ2ZHdsZzAwNHMzMXF4bGc2eWs1M3EifQ.kC8bK97vtoDXXrodRelttw',
-    container: 'map' // container ID
+    container: 'map',
+    // container ID
     // center: [-118.113491,34.111745], // starting position [lng, lat]. Note that lat must be set between -90 and 90
     // zoom: 9, // starting zoom
-    // scrollZoom: false
+    scrollZoom: false
   });
   const bounds = new mapboxgl.LngLatBounds();
   locations.forEach(loc => {
@@ -7286,7 +7287,8 @@ const dispalyMap = locations => {
 
     // Add popup
     new mapboxgl.Popup({
-      offset: 30
+      offset: 30,
+      focusAfterOpen: false
     }).setLngLat(loc.coordinates).setHTML("<p>Day ".concat(loc.day, ": ").concat(loc.description, "</p>")).addTo(map);
 
     // Extend map bounds to include current location

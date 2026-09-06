@@ -7,7 +7,7 @@ export const dispalyMap =(locations)=>{
       container: 'map', // container ID
       // center: [-118.113491,34.111745], // starting position [lng, lat]. Note that lat must be set between -90 and 90
       // zoom: 9, // starting zoom
-      // scrollZoom: false
+      scrollZoom: false
   });
 
   const bounds = new mapboxgl.LngLatBounds();
@@ -27,7 +27,8 @@ export const dispalyMap =(locations)=>{
 
     // Add popup
     new mapboxgl.Popup({
-      offset: 30
+      offset: 30,
+      focusAfterOpen: false
     })
       .setLngLat(loc.coordinates)
       .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`)

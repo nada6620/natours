@@ -7,7 +7,7 @@ router.use(authController.protect)
 
 router.get('/',reviewController.getAllReviwes)
 router.get('/:id',reviewController.getReview)
-router.post('/',authController.restrictTo('user'),reviewController.setTourUserIds,reviewController.checkBooking,reviewController.createReview)
+router.post('/',authController.restrictTo('user'),reviewController.setTourUserIds,reviewController.checkBooking,reviewController.checkReview,reviewController.createReview)
 router.delete('/:id',authController.restrictTo('user','admin'),reviewController.deleteReview)
 router.patch('/:id',authController.restrictTo('user','admin'),reviewController.updateReview)
 

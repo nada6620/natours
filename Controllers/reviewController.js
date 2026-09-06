@@ -3,6 +3,8 @@ const appError =require('../Utils/appError')
 const catchAsync = require('../Utils/catchAsync');
 const factory = require('./handlerFactory')
 const Booking = require('../Models/bookingModel')
+const Review = require('../Models/reviewModel')
+
 // get all reviews 
 
 
@@ -22,6 +24,20 @@ exports.checkBooking = catchAsync(async(req,res,next)=>{
       next();
 })
 
+exports.checkReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findOne({
+    user: req.user.id,
+    tour: req.params.tourid
+  });
+
+  if (review) {
+    return next(
+      new appError('You have already reviewed this tour', 400)
+    );
+  }
+
+  next();
+});
 
 exports.getAllReviwes =  factory.getAll(reviewSchema)
 exports.getReview = factory.getOne(reviewSchema,{path:'tour',select:'name'})

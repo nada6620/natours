@@ -16,6 +16,10 @@ console.log(data instanceof FormData);
 
     if(res.data.status==='success'){
         showAlert('success',`${type.toUpperCase()} updated successfully! `)
+
+         if (type === 'data' && res.data.data.user.photo) {
+          document.querySelector('.form__user-photo').src = res.data.data.user.photo;
+        }
     }
 
  }catch(err){

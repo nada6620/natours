@@ -7327,6 +7327,9 @@ const updateSettings = async (data, type) => {
     });
     if (res.data.status === 'success') {
       (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully! "));
+      if (type === 'data' && res.data.data.user.photo) {
+        document.querySelector('.form__user-photo').src = res.data.data.user.photo;
+      }
     }
   } catch (err) {
     (0, _alerts.showAlert)('error', err.response.data.message);
@@ -7510,7 +7513,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52599" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65227" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema ({
     ,
     password:{
         type:String,
-        required:[true,'A user must has a password'],
-        minlength:8,
+        required: [true, 'Please enter a password'],
+        minlength: [8, 'Password must be at least 8 characters long'],
         // validate:{
         //     validator:function(value){
         //     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value)
@@ -41,13 +41,13 @@ const userSchema = new mongoose.Schema ({
         },
     passwordConfirm:{
         type:String,
-        required:[true,'Repeat the password plz'],
+        required:[true,'Please confirm your password'],
         // Only work with Save and Create
         validate:{
             validator:function(value){
                 return this.password===value;
             },
-            message:'passwords are not the same'
+            message:'Passwords do not match. Please try again.'
         }
     } ,
     passwordChangedAt:Date,

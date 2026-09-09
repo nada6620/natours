@@ -22,13 +22,13 @@ const handleDuplicateFieldsDB = (err) => {
 };
 
 // handle validation error
-const handleValidationErrorDB=(err)=>{
-    // Object.values(err.errors) => return array of only values 
-    const errors = Object.values(err.errors).map(el=>el.message); // array of messages
-    const message=`Invalid input data. ${errors.join('. ')}`;
-    return new AppError(message,400);
+const handleValidationErrorDB = (err) => {
+  const errors = Object.values(err.errors).map(el => el.message);
 
-}
+  const message = errors.join('. ');
+
+  return new AppError(message, 400);
+};
 
 const handelJwtError = ()=> new AppError('Invalid token. please log in again!',401);
 const handleJWTExpiredError =()=> new AppError('Your token has expired! Please log in again.', 401)

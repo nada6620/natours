@@ -6,11 +6,19 @@ const handleCastErrorDB=(err)=>{
     return new AppError(message,400);
 }
 
-// handle duplicate tour name
-const handleDuplicateFieldsDB=(err)=>{
-    const value = err.keyValue.name;
-    const message = `Duplicate field value : ${value} . please use another value!`
-    return new AppError(message,400)
+// handle duplicate value 
+const handleDuplicateFieldsDB = (err) => {
+  const field = Object.keys(err.keyValue)[0];
+
+  let message;
+
+  if (field === 'email') {
+    message = 'This email is already registered. Please use another email.';
+  } else {
+    message = `This ${field} is already in use. Please use another value.`;
+  }
+
+  return new AppError(message, 400);
 };
 
 // handle validation error

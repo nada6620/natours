@@ -8,8 +8,8 @@ const bookingRoutes =require('../Routes/bookingRouter')
 
 
 const {
-  deleteTour, updateTour, getTour, createTour, getAllTours,aliasTopTour,getTourStats ,getMonyhlyPlan
-,getToursWithin,getDistance,uploadTourImages,resizeTourImages} = require('../Controllers/tourController');
+  deleteTour, updateTour, getTour,getTourForAdmin, createTour, getAllTours,aliasTopTour,getTourStats ,getMonyhlyPlan
+,getToursWithin,getDistance,uploadTourImages,resizeTourImages,parseTourNestedFields} = require('../Controllers/tourController');
 
 // nested routes
 router.use('/:tourid/reviews',reviewRoutes);
@@ -24,8 +24,15 @@ router.get('/tour-within/:distance/center/:latlng/unit/:unit',getToursWithin)
 router.get('/distances/:latlng/unit/:unit',getDistance)
 router.get('/',authController.protect, getAllTours);
 router.get('/:id', getTour);
-router.post('/',authController.protect,authController.restrictTo('admin','lead-guide'), createTour);
-router.patch('/:id', authController.protect,authController.restrictTo('admin','lead-guide'),uploadTourImages,resizeTourImages,updateTour);
+//get tour for admin 
+router.get(
+  '/admin/:id',
+  authController.protect,
+  authController.restrictTo('admin', 'lead-guide'),
+  getTourForAdmin
+);
+router.post('/',authController.protect,authController.restrictTo('admin','lead-guide'),uploadTourImages,resizeTourImages,parseTourNestedFields, createTour);
+router.patch('/:id', authController.protect,authController.restrictTo('admin','lead-guide'),uploadTourImages,resizeTourImages,parseTourNestedFields,updateTour);
 router.delete('/:id',authController.protect,authController.restrictTo('admin','lead-guide'), deleteTour);
 
 

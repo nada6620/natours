@@ -44,11 +44,12 @@ router.patch(
 router.delete('/deleteMe',deleteMe)
 
 
-router.use(authController.restrictTo('admin'))
+router.use(authController.protect, authController.restrictTo('admin'));
+
 router.get('/', getAllUsers);
 router.get('/:id', getUser);
-router.post('/', createUser);
-router.patch('/:id', updateUser);
+router.post('/', uploadUserPhoto, resizeUserPhoto, createUser);
+router.patch('/:id', uploadUserPhoto, resizeUserPhoto, updateUser);
 router.delete('/:id', deleteUser);
 
 module.exports = router;

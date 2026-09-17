@@ -1,0 +1,137 @@
+extends base
+
+block append head
+  link(rel='stylesheet', href='/css/create-tour-modal.css')
+  link(rel='stylesheet', href='/css/confirm-modal.css')
+
+block content
+  main.main
+    .user-view__content
+      .admin-form
+        //- Header with Title and Create Button
+        .admin-form__header(style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;")
+          h2.heading-secondary.ma-bg-bottom(style="margin: 0;") Manage Tours
+          button.btn.btn--green#open-create-tour(type="button", style="padding: 10px 20px; font-size: 1.4rem; border: none; cursor: pointer;") Create new tour
+
+        table.tour-table(style="width: 100%; border-collapse: collapse; font-size: 1.5rem;")
+          thead
+            tr
+              th(style="padding: 12px; text-align: left; color: #777;") Image
+              th(style="padding: 12px; text-align: left; color: #777;") Name
+              th(style="padding: 12px; text-align: left; color: #777;") Price
+              th(style="padding: 12px; text-align: left; color: #777;") Size
+              th(style="padding: 12px; text-align: left; color: #777;") Difficulty
+              th(style="padding: 12px; text-align: left; color: #777;") Rating
+              th(style="padding: 12px; text-align: center; color: #777;") Action
+          tbody
+            each tour in tours
+              tr(style="border-bottom: 1px solid #eee;")
+                td(style="padding: 12px;")
+                  img(src=`/img/tours/${tour.imageCover}`, alt=tour.name, style="width: 90px; height: 60px; object-fit: cover; border-radius: 6px;")
+                td(style="padding: 12px; font-weight: 500; color: #333;")= tour.name
+                td(style="padding: 12px;")=`$${tour.price}`
+                td(style="padding: 12px;")= tour.maxGroupSize
+                td(style="padding: 12px; text-transform: capitalize;")= tour.difficulty
+                td(style="padding: 12px;")=`⭐ ${tour.ratingsAverage}`
+                td(style="padding: 12px; text-align: center; white-space: nowrap;")
+                  button.btn.btn--green.btn--small.edit-tour-btn(type="button", data-id=tour._id, style="padding: 8px 16px; font-size: 1.3rem; margin-right: 8px; border: none; cursor: pointer;") Edit
+                  button.btn.btn--red.btn--small.delete-tour-btn(data-id=tour._id, style="padding: 8px 16px; font-size: 1.3rem; background-color: #eb4d4b; border: none; color: white; cursor: pointer; border-radius: 10rem;") Delete
+
+        //- ============= CREATE / EDIT TOUR MODAL (shared) ============= --
+        #create-tour-overlay.ct-overlay
+          .ct-modal
+            .ct-modal__header
+              h3#ct-modal-title.heading-secondary(style="margin: 0;") Create New Tour
+              button#close-create-tour.ct-close(type="button", aria-label="Close") &times;
+
+            form#create-tour-form.ct-form(enctype="multipart/form-data")
+
+              .ct-section
+                h4.ct-section__title Basic Info
+                .form__group
+                  label.form__label(for="ct-name") Tour Name
+                  input#ct-name.form__input(type="text", name="name", required, placeholder="e.g. The Sea Explorer")
+
+                .ct-row
+                  .form__group
+                    label.form__label(for="ct-duration") Duration (days)
+                    input#ct-duration.form__input(type="number", name="duration", min="1", required)
+                  .form__group
+                    label.form__label(for="ct-maxGroupSize") Max Group Size
+                    input#ct-maxGroupSize.form__input(type="number", name="maxGroupSize", min="1", required)
+
+                .ct-row
+                  .form__group
+                    label.form__label(for="ct-difficulty") Difficulty
+                    select#ct-difficulty.form__input(name="difficulty", required)
+                      option(value="easy") Easy
+                      option(value="medium", selected) Medium
+                      option(value="difficult") Difficult
+                  .form__group
+                    label.form__label(for="ct-price") Price ($)
+                    input#ct-price.form__input(type="number", name="price", min="0", required)
+
+                .form__group
+                  label.form__label(for="ct-summary") Summary
+                  input#ct-summary.form__input(type="text", name="summary", required, placeholder="One-line summary")
+
+                .form__group
+                  label.form__label(for="ct-description") Description
+                  textarea#ct-description.form__input(name="description", rows="4", required)
+
+                .form__group.ct-checkbox
+                  input#ct-secretTour(type="checkbox", name="secretTour")
+                  label(for="ct-secretTour") Secret Tour
+
+              .ct-section
+                h4.ct-section__title Media
+                p.ct-hint
+                .ct-row
+                  .form__group
+                    label.form__label(for="ct-imageCover") Cover Image
+                    input#ct-imageCover(type="file", name="imageCover", accept="image/*")
+                  .form__group
+                    label.form__label(for="ct-images") Gallery Images
+                    input#ct-images(type="file", name="images", accept="image/*", multiple)
+
+              .ct-section
+                h4.ct-section__title Start Location
+                .form__group
+                  label.form__label(for="ct-startAddress") Address
+                  input#ct-startAddress.form__input(type="text", name="startAddress", required)
+                .form__group
+                  label.form__label(for="ct-startDescription") Description
+                  input#ct-startDescription.form__input(type="text", name="startDescription", required)
+                .ct-row
+                  .form__group
+                    label.form__label(for="ct-startLng") Longitude
+                    input#ct-startLng.form__input(type="number", step="any", name="startLng", required)
+                  .form__group
+                    label.form__label(for="ct-startLat") Latitude
+                    input#ct-startLat.form__input(type="number", step="any", name="startLat", required)
+
+              .ct-section
+                .ct-section__header
+                  h4.ct-section__title Itinerary Locations
+                  button#ct-add-location.ct-add-btn(type="button") + Add Location
+                #ct-locations
+
+              .ct-section
+                .ct-section__header
+                  h4.ct-section__title Start Dates
+                  button#ct-add-date.ct-add-btn(type="button") + Add Date
+                #ct-dates
+
+              .ct-section
+                h4.ct-section__title Guides
+                .ct-guides
+                  each guide in guides
+                    label.ct-guide-chip
+                      input(type="checkbox", name="guides[]", value=guide.id)
+                      - const imgPath = guide.photo && guide.photo.startsWith('http') ? guide.photo : `/img/users/${guide.photo || 'default.jpg'}`
+                      img(src=imgPath, alt=guide.name, onerror="this.src='/img/users/default.jpg'", style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;")
+                      span= guide.name
+
+              .ct-modal__actions
+                button#cancel-create-tour.btn.btn--small(type="button", style="background:#eee;color:#333;border:none;cursor:pointer;") Cancel
+                button#ct-submit-btn.btn.btn--green(type="submit") Create Tour

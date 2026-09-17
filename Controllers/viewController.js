@@ -109,3 +109,55 @@ const reviews = await Review.find({ user: req.user.id })
     reviews
   })
 });
+
+exports.getManageTours = catchAsync(async(req,res,next)=>{
+  const [tours, guides] = await Promise.all([
+    Tour.find().setOptions({includeSecretTours: true }),
+    User.find({ role: { $in: ['guide','lead-guide'] } })
+  ]);
+  res.status(200).render('manageTours', { title:'Manage Tours', tours, guides });
+});
+
+exports.getManageUsers=catchAsync(async(req,res,next)=>{
+  const users = await User.find().select('+active').setOptions({ includeInactiveUsers: true });;
+  res.status(200).render('manageUsers',{
+    title:'Manage Users',
+    users
+  })
+});
+
+exports.getManagebookings =catchAsync(async(req,res,next)=>{
+  const bookings = await Booking.find()
+    .populate({
+      path: 'user',
+      select: 'name email photo'
+    })
+    .populate({
+      path: 'tour',
+      select: 'name price imageCover'
+    })
+    .sort('-createdAt');
+
+  res.status(200).render('manageBookings', {
+    title: 'Manage Bookings',
+    bookings
+  });
+});
+
+exports.getManageReviews=catchAsync(async(req,res,next)=>{
+   const reviews = await Review.find()
+    .populate({
+      path: 'user',
+      select: 'name email photo'
+    })
+    .populate({
+      path: 'tour',
+      select: 'name'
+    })
+    .sort('-createdAt');
+
+  res.status(200).render('manageReviews', {
+    title: 'Manage Reviews',
+    reviews
+  });
+});

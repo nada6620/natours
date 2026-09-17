@@ -1,5 +1,8 @@
 extends base
 
+block append head
+  link(rel='stylesheet', href='/css/confirm-modal.css')
+
 mixin navItem(link, text, icon, active)
    li(class=`${active?'side-nav--active':''}`)
       a(href=`${link}`)
@@ -7,8 +10,8 @@ mixin navItem(link, text, icon, active)
             use(xlink:href=`/img/icons.svg#icon-${icon}`)
          | #{text}
 
-mixin accountReviewCard(review)
-   .reviews__card
+mixin accountReviewCard(review, currentUser)
+   .reviews__card(data-review-id=`${review._id}`)
       if review.tour
          span.reviews__tour-tag= review.tour.name
 
@@ -19,14 +22,28 @@ mixin accountReviewCard(review)
          )
          h6.reviews__user= review.user.name
 
-      p.reviews__text= review.review
+      p.reviews__text.js-review-text= review.review
 
       .reviews__rating
          each star in [1,2,3,4,5]
             svg.reviews__star(
                class=`reviews__star--${review.rating >= star ? 'active' : 'inactive'}`
+               data-value=star
             )
                use(xlink:href='/img/icons.svg#icon-star')
+
+      if currentUser && (String(review.user._id) === String(currentUser._id) || currentUser.role === 'admin')
+         .reviews__actions
+            button.btn.btn--small.edit-review-btn(
+               type='button'
+               data-id=`${review._id}`
+               data-review=review.review
+               data-rating=review.rating
+            ) Edit
+            button.btn.btn--small.btn--red.delete-review-btn(
+               type='button'
+               data-id=`${review._id}`
+            ) Delete
 
 block content
   main.main
@@ -41,10 +58,10 @@ block content
             .admin-nav
               h5.admin-nav__heading Admin
               ul.side-nav
-                +navItem('#', 'Manage tours', 'map', false)
-                +navItem('#', 'Manage users', 'users', false)
-                +navItem('#', 'Manage reviews', 'star', false)
-                +navItem('#', 'Manage bookings', 'briefcase', false)
+                +navItem('/manage-tour', 'Manage tours', 'map', false)
+                +navItem('/manage-user', 'Manage users', 'users', false)
+                +navItem('/manage-review', 'Manage reviews', 'star', false)
+                +navItem('/manage-booking', 'Manage bookings', 'briefcase', false)
 
       .user-view__content(style='max-width: 100%; padding-left: 4rem; padding-right: 4rem;')
         h2.heading-secondary.ma-bt-md My Reviews
@@ -54,4 +71,114 @@ block content
         else
           .reviews
             each review in reviews
-              +accountReviewCard(review)
+              +accountReviewCard(review, user)
+
+    //- Edit Review Overlay
+    #edit-review-overlay.review-edit-overlay
+      .review-edit-overlay__box
+        h3(style="font-size: 2.2rem; font-weight: 600; color: #333; margin-bottom: 20px;") Edit your review
+        
+        form#edit-review-form
+          .form__group(style="margin-bottom: 20px;")
+            label(for='edit-review-text', style="display: block; font-size: 1.4rem; font-weight: 500; color: #555; margin-bottom: 8px;") Review
+            textarea#edit-review-text.form__input(rows='4', style="font-size: 1.4rem; padding: 12px;")
+          
+          .form__group(style="margin-bottom: 25px;")
+            label(for='edit-review-rating', style="display: block; font-size: 1.4rem; font-weight: 500; color: #555; margin-bottom: 8px;") Rating
+            
+            .star-rating(style="display: flex; gap: 5px; cursor: pointer;")
+              - for (let i = 1; i <= 5; i++)
+                span.star(data-value=i, style="font-size: 2.4rem; color: #e4e5e9;") ★
+            
+            input#edit-review-rating.rating-value-input(type='hidden', name='rating', value='5')
+
+          .review-edit-overlay__actions(style="display: flex; justify-content: flex-end; gap: 10px;")
+            button#cancel-edit-review.btn.btn--small(type='button', style="font-size: 1.4rem; padding: 10px 20px;") Cancel
+            button#save-edit-review.btn.btn--small.btn--green(type='submit', style="font-size: 1.4rem; padding: 10px 20px;") Save
+
+    //- Confirm Delete Review Modal (تم نقله هنا في المستوى الرئيسي وترتيبه بشكل صحيح)
+    #delete-review-overlay.cf-overlay
+      .cf-modal
+        .cf-icon !
+        h3.cf-title Delete Review?
+        p.cf-message Are you sure you want to delete this review? This action cannot be undone.
+        .cf-actions
+          button#cancel-delete-review.cf-btn-cancel(type="button") Cancel
+          button#confirm-delete-review.cf-btn-confirm(type="button") Delete
+ 
+      style.
+        /* Review Edit Modal */
+        .review-edit-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          z-index: 3000;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .review-edit-overlay--open {
+          display: flex;
+        }
+
+        .review-edit-overlay__box {
+          background: #fff;
+          padding: 3rem;
+          border-radius: 6px;
+          width: 90%;
+          max-width: 45rem;
+        }
+
+        .review-edit-overlay__actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+          margin-top: 2rem;
+        }
+
+        /* Review Action Buttons */
+        .reviews__actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-top: 1.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        .reviews__actions .edit-review-btn,
+        .reviews__actions .delete-review-btn {
+          border: none;
+          border-radius: 10rem;
+          padding: 0.8rem 1.6rem;
+          font-size: 1.3rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        /* Edit Button */
+        .reviews__actions .edit-review-btn {
+          background-color: #55c57a;
+          color: #fff;
+        }
+
+        .reviews__actions .edit-review-btn:hover {
+          background-color: #3aa863;
+          transform: translateY(-1px);
+        }
+
+        /* Delete Button */
+        .reviews__actions .delete-review-btn {
+          background-color: #eb4d4b;
+          color: #fff;
+        }
+
+        .reviews__actions .delete-review-btn:hover {
+          background-color: #d63031;
+          transform: translateY(-1px);
+        }

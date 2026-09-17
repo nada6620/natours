@@ -1,0 +1,103 @@
+extends base
+
+block append head
+  link(rel='stylesheet', href='/css/create-tour-modal.css')
+  link(rel='stylesheet', href='/css/confirm-modal.css')
+
+block content
+  main.main
+    .user-view__content
+      .admin-form
+        //- Header with Title and Create Button
+        .admin-form__header(style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;")
+          h2.heading-secondary.ma-bg-bottom(style="margin: 0;") Manage Users
+          button.btn.btn--green#open-create-user(type="button", style="padding: 10px 20px; font-size: 1.4rem; border: none; cursor: pointer;") Create new user
+
+        table.tour-table(style="width: 100%; border-collapse: collapse; font-size: 1.5rem;")
+          thead
+            tr
+              th(style="padding: 12px; text-align: left; color: #777;") Photo
+              th(style="padding: 12px; text-align: left; color: #777;") Name
+              th(style="padding: 12px; text-align: left; color: #777;") Email
+              th(style="padding: 12px; text-align: left; color: #777;") Role
+              th(style="padding: 12px; text-align: left; color: #777;") Status
+              th(style="padding: 12px; text-align: center; color: #777;") Action
+          tbody
+            each user in users
+              tr(style="border-bottom: 1px solid #eee;")
+                td(style="padding: 12px;")
+                  - const imgPath = user.photo && user.photo.startsWith('http') ? user.photo : `/img/users/${user.photo || 'default.jpg'}`
+                  img(src=imgPath, alt=user.name, onerror="this.src='/img/users/default.jpg'", style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;")
+                td(style="padding: 12px; font-weight: 500; color: #333;")= user.name
+                td(style="padding: 12px; color: #555;")= user.email
+                td(style="padding: 12px; text-transform: capitalize;")= user.role
+                td(style="padding: 12px;")
+                  if user.active
+                    span(style="color: #2ecc71; font-weight: 600;") Active
+                  else
+                    span(style="color: #eb4d4b; font-weight: 600;") Inactive
+                td(style="padding: 12px; text-align: center; white-space: nowrap;")
+                  button.btn.btn--green.btn--small.edit-user-btn(
+                    type="button",
+                    data-id=user._id,
+                    data-name=user.name,
+                    data-email=user.email,
+                    data-role=user.role,
+                    data-active=`${user.active}`
+                    style="padding: 8px 16px; font-size: 1.3rem; margin-right: 8px; border: none; cursor: pointer;"
+                  ) Edit
+                  button.btn.btn--red.btn--small.delete-user-btn(data-id=user._id, style="padding: 8px 16px; font-size: 1.3rem; background-color: #eb4d4b; border: none; color: white; cursor: pointer; border-radius: 10rem;") Delete
+
+        //- ============= CREATE / EDIT USER MODAL (shared) ============= --
+        //- Reuses the same .ct-* / .form__* classes as the tour modal, so no extra CSS is needed
+        #create-user-overlay.ct-overlay
+          .ct-modal
+            .ct-modal__header
+              h3#cu-modal-title.heading-secondary(style="margin: 0;") Create New User
+              button#close-create-user.ct-close(type="button", aria-label="Close") &times;
+
+            form#create-user-form.ct-form(enctype="multipart/form-data")
+              input#cu-id(type="hidden", name="id")
+
+              .ct-section
+                h4.ct-section__title Basic Info
+                .form__group
+                  label.form__label(for="cu-name") Full Name
+                  input#cu-name.form__input(type="text", name="name", required, placeholder="e.g. Jonas Schmedtmann")
+
+                .form__group
+                  label.form__label(for="cu-email") Email
+                  input#cu-email.form__input(type="email", name="email", required, placeholder="e.g. admin@natours.io")
+
+                .form__group#cu-password-group
+                  label.form__label(for="cu-password") Password
+                  input#cu-password.form__input(type="password", name="password", minlength="8", placeholder="Min. 8 characters")
+                  p.ct-hint#cu-password-hint Leave blank to keep the current password
+                
+                .form__group#cu-password-confirm-group
+                  label.form__label(for="cu-password-confirm") Confirm Password
+                  input#cu-password-confirm.form__input(type="password", name="passwordConfirm", placeholder="Confirm password")
+
+              .ct-section
+                h4.ct-section__title Photo
+                .form__group
+                  label.form__label(for="cu-photo") Profile Photo
+                  input#cu-photo(type="file", name="photo", accept="image/*")
+
+              .ct-section
+                h4.ct-section__title Role &amp; Status
+                .ct-row
+                  .form__group
+                    label.form__label(for="cu-role") Role
+                    select#cu-role.form__input(name="role", required)
+                      option(value="user") User
+                      option(value="guide") Guide
+                      option(value="lead-guide") Lead Guide
+                      option(value="admin") Admin
+                  .form__group.ct-checkbox
+                    input#cu-active(type="checkbox", name="active" )
+                    label(for="cu-active") Active
+
+              .ct-modal__actions
+                button#cancel-create-user.btn.btn--small(type="button", style="background:#eee;color:#333;border:none;cursor:pointer;") Cancel
+                button#cu-submit-btn.btn.btn--green(type="submit") Create User

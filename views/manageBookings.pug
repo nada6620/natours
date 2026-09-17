@@ -1,0 +1,87 @@
+extends base
+
+block append head
+  link(rel='stylesheet', href='/css/confirm-modal.css')
+
+block content
+  main.main
+    .user-view__content
+      .admin-form
+
+        //- Header
+        .admin-form__header(style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;")
+          h2.heading-secondary.ma-bg-bottom(style="margin: 0;") Manage Bookings
+
+        //- Bookings Table
+        table.tour-table(style="width: 100%; border-collapse: collapse; font-size: 1.5rem;")
+          thead
+            tr
+              th(style="padding: 12px; text-align: left; color: #777;") User
+              th(style="padding: 12px; text-align: left; color: #777;") Email
+              th(style="padding: 12px; text-align: left; color: #777;") Tour
+              th(style="padding: 12px; text-align: left; color: #777;") Price
+              th(style="padding: 12px; text-align: left; color: #777;") Booking Date
+              th(style="padding: 12px; text-align: center; color: #777;") Payment
+              th(style="padding: 12px; text-align: center; color: #777;") Action
+
+          tbody
+            each booking in bookings
+              tr(style="border-bottom: 1px solid #eee;")
+
+                //- User
+                //- User
+                td(style="padding: 12px;")
+                    if booking.user
+                        - const imgPath = booking.user.photo && booking.user.photo.startsWith('http') ? booking.user.photo : `/img/users/${booking.user.photo || 'default.jpg'}`
+                        .booking-user(style="display: flex; align-items: center; gap: 10px;")
+                        img(
+                            src=imgPath
+                            alt=booking.user.name
+                            onerror="this.src='/img/users/default.jpg'"
+                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"
+                        )
+                        span(style="font-weight: 500; color: #333;")= booking.user.name
+                    else
+                        span(style="color: #aaa; font-style: italic;") Deleted user
+
+                //- Email
+                td(style="padding: 12px;")= booking.user ? booking.user.email : '—'
+
+                //- Tour
+                td(style="padding: 12px; font-weight: 500; color: #333;")= booking.tour ? booking.tour.name : 'Deleted tour'
+
+                //- Price
+                td(style="padding: 12px;")= `$${booking.price}`
+
+                //- Booking Date
+                td(style="padding: 12px;")= new Date(booking.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+
+                //- Payment
+                td(style="padding: 12px; text-align: center;")
+                  if booking.paid
+                    span(
+                      style="display: inline-block; padding: 5px 12px; border-radius: 10rem; background: rgba(40, 180, 133, 0.12); color: #28b485; font-size: 1.2rem; font-weight: 600;"
+                    ) Paid
+                  else
+                    span(
+                      style="display: inline-block; padding: 5px 12px; border-radius: 10rem; background: rgba(235, 77, 75, 0.12); color: #eb4d4b; font-size: 1.2rem; font-weight: 600;"
+                    ) Unpaid
+
+                //- Action
+                td(style="padding: 12px; text-align: center; white-space: nowrap;")
+                  button.btn.btn--red.btn--small.delete-booking-btn(
+                    type="button"
+                    data-id=booking._id
+                    style="padding: 8px 16px; font-size: 1.3rem; background-color: #eb4d4b; border: none; color: white; cursor: pointer; border-radius: 10rem;"
+                  ) Delete
+
+        //- Confirm Delete Modal
+        #delete-booking-overlay.cf-overlay
+          .cf-modal
+            .cf-icon !
+            h3.cf-title Delete Booking?
+            p.cf-message Are you sure you want to delete this booking? This action cannot be undone.
+
+            .cf-actions
+              button#cancel-delete-booking.cf-btn-cancel(type="button") Cancel
+              button#confirm-delete-booking.cf-btn-confirm(type="button") Delete

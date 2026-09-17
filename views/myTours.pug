@@ -21,10 +21,10 @@ block content
             .admin-nav
               h5.admin-nav__heading Admin
               ul.side-nav
-                +navItem('#', 'Manage tours', 'map', false)
-                +navItem('#', 'Manage users', 'users', false)
-                +navItem('#', 'Manage reviews', 'star', false)
-                +navItem('#', 'Manage bookings', 'briefcase', false)
+                +navItem('/manage-tour', 'Manage tours', 'map', false)
+                +navItem('/manage-user', 'Manage users', 'users', false)
+                +navItem('/manage-review', 'Manage reviews', 'star', false)
+                +navItem('/manage-booking', 'Manage bookings', 'briefcase', false)
 
       .user-view__content(style='max-width: 100%; padding-left: 4rem; padding-right: 4rem;')
         h2.heading-secondary.ma-bt-md My Booked Tours

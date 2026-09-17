@@ -1,0 +1,74 @@
+extends base
+
+block append head
+  link(rel='stylesheet', href='/css/confirm-modal.css')
+
+block content
+  main.main
+    .user-view__content
+      .admin-form
+
+        //- Header
+        .admin-form__header(
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;"
+        )
+          h2.heading-secondary.ma-bg-bottom(style="margin: 0;") Manage Reviews
+
+        //- Reviews Table
+        table.tour-table(
+          style="width: 100%; border-collapse: collapse; font-size: 1.5rem;"
+        )
+          thead
+            tr
+              th(style="padding: 12px; text-align: left; color: #777;") User
+              th(style="padding: 12px; text-align: left; color: #777;") Email
+              th(style="padding: 12px; text-align: left; color: #777;") Tour
+              th(style="padding: 12px; text-align: center; color: #777;") Rating
+              th(style="padding: 12px; text-align: left; color: #777;") Review
+              th(style="padding: 12px; text-align: left; color: #777;") Date
+
+          tbody
+            each review in reviews
+              tr(style="border-bottom: 1px solid #eee;")
+
+                //- User
+                td(style="padding: 12px;")
+                  if review.user
+                    - const imgPath = review.user.photo && review.user.photo.startsWith('http') ? review.user.photo : `/img/users/${review.user.photo || 'default.jpg'}`
+                    .review-user(style="display: flex; align-items: center; gap: 10px;")
+                      img(
+                        src=imgPath
+                        alt=review.user.name
+                        onerror="this.src='/img/users/default.jpg'"
+                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"
+                      )
+                      span(style="font-weight: 500; color: #333;")= review.user.name
+                  else
+                    span(style="color: #aaa; font-style: italic;") Deleted user
+
+                //- Email
+                td(style="padding: 12px;")
+                  if review.user
+                    = review.user.email
+                  else
+                    | —
+
+                //- Tour
+                td(style="padding: 12px; font-weight: 500; color: #333;")
+                  if review.tour
+                    = review.tour.name
+                  else
+                    span(style="color: #aaa; font-style: italic;") Deleted tour
+
+                //- Rating
+                td(style="padding: 12px; text-align: center; white-space: nowrap;")
+                  span(style="font-size: 1.4rem;")= `⭐ ${review.rating}`
+
+                //- Review
+                td(
+                  style="padding: 12px; max-width: 350px; color: #555; line-height: 1.5;"
+                )= review.review
+
+                //- Date
+                td(style="padding: 12px; white-space: nowrap;")
+                  = new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })

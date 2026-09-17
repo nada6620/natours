@@ -26,6 +26,13 @@ router.get('/my-reviews', authController.protect, viewController.getMyReviews);
 
 router.post('/submit-user-data',authController.protect,viewController.updateUserData)
 
+// tour manages
+router.get('/manage-tour',authController.protect,authController.restrictTo('admin','lead-guide'),viewController.getManageTours)
+router.get('/manage-user',authController.protect,authController.restrictTo('admin','lead-guide'),viewController.getManageUsers)
+router.get('/manage-booking',authController.protect,authController.restrictTo('admin','lead-guide'),viewController.getManagebookings)
+router.get('/manage-review',authController.protect,authController.restrictTo('admin','lead-guide'),viewController.getManageReviews)
+
+
 
 
 module.exports=router

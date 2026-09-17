@@ -103,6 +103,15 @@ res.status(200).json({received: true})
 
 exports.createBooking = factory.createOne(Booking)
 exports.getBooking = factory.getOne(Booking)
-exports.getAllBooking = factory.getAll(Booking);
+exports.getAllBooking = factory.getAll(Booking,  [
+    {
+      path: 'user',
+      select: 'name email photo'
+    },
+    {
+      path: 'tour',
+      select: 'name price imageCover'
+    }
+  ]);
 exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);

@@ -20,7 +20,7 @@ const tourSchema = new mongoose.Schema ({
     },
     difficulty:{
         type:'String',
-        require:[true,'A tour must have a difficulty'],
+        required:[true,'A tour must have a difficulty'],
         enum:{
           values:  ['easy','difficult','medium'],
           message:'Difficulty is either : easy , medium , difficult '
@@ -148,8 +148,11 @@ tourSchema.post('save',function(doc){
 
 // Query middelware 
 tourSchema.pre(/^find/,function(){
+    if(!this.getOptions().includeSecretTours){
     this.find({secretTour:{$ne:true}})
+    }
     this.start = Date.now();
+     
 })
 
 tourSchema.pre(/^find/,function(){

@@ -18,10 +18,11 @@ exports.updateOne = Model =>catchAsync (async (req, res,next) => {
       const doc = await Model.findByIdAndUpdate(id,req.body,{
         new:true,
         runValidators:true
-      });
+      }).setOptions({ includeSecretTours: true,
+                      includeInactiveUsers: true });
 
        if(!doc){
-      return next(new APPError('No document found with that ID',404))
+      return next(new appError('No document found with that ID',404))
     }
 
 
@@ -63,7 +64,7 @@ exports.getOne= (Model,popOption) => catchAsync (async (req, res,next) => {
       });
     });
 
-exports.getAll = Model=> catchAsync (async (req, res,next) => {
+exports.getAll = (Model,popOption)=> catchAsync (async (req, res,next) => {
 
    // to allow for nested Get reviews on tour
    let filter ={}
@@ -72,7 +73,13 @@ exports.getAll = Model=> catchAsync (async (req, res,next) => {
 
   //# 6) Execute Query
     const features = new APIFeatureas(Model.find(filter),req.query).filter().sort().limitFields().pagination();
-    const doc = await features.query;
+   let query = features.query;
+
+  if (popOption) {
+    query = query.populate(popOption);
+  }
+
+  const doc = await query;
 
     // Send Response
     res.status(200).json({

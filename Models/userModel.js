@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema ({
     },
     role:{
         type:String,
-        enum: ['user', 'admin', 'guide', 'lead-guid'],
+        enum: ['user', 'admin', 'guide', 'lead-guide'],
         default:'user'
     }
     ,
@@ -76,7 +76,9 @@ this.passwordConfirm=undefined;
 })
 
 userSchema.pre(/^find/,function(){
-    this.find({active:{$ne:false}})
+     if (!this.getOptions().includeInactiveUsers) {
+        this.find({ active: { $ne: false } });
+    }
 })
 
 

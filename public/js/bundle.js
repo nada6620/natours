@@ -7391,6 +7391,605 @@ const createReview = async (tourId, review, rating) => {
   }
 };
 exports.createReview = createReview;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"manageAccountReview.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateReview = exports.deleteReview = void 0;
+var _axios = _interopRequireDefault(require("axios"));
+var _alerts = require("./alerts");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const updateReview = async (reviewId, review, rating) => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'PATCH',
+      url: "/api/v1/reviews/".concat(reviewId),
+      data: {
+        review,
+        rating
+      }
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Review updated successfully!');
+      window.setTimeout(() => {
+        location.reload();
+      }, 1000);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message);
+  }
+};
+exports.updateReview = updateReview;
+const deleteReview = async reviewId => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'DELETE',
+      url: "/api/v1/reviews/".concat(reviewId)
+    });
+    if (res.status === 204) {
+      (0, _alerts.showAlert)('success', 'Review deleted successfully!');
+      window.setTimeout(() => {
+        location.reload();
+      }, 1000);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message);
+  }
+};
+exports.deleteReview = deleteReview;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"manageTour.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateTour = exports.getTour = exports.deleteTour = exports.createTour = void 0;
+var _axios = _interopRequireDefault(require("axios"));
+var _alerts = require("./alerts");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+// delete
+
+const deleteTour = async tourId => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'DELETE',
+      url: "/api/v1/tours/".concat(tourId)
+    });
+    if (res.status === 204) {
+      (0, _alerts.showAlert)('success', 'Tour deleted successfully!');
+      window.setTimeout(() => {
+        location.reload(); // إعادة تحميل الصفحة عشان الجدول يتحدث
+      }, 1000);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message || 'Error deleting tour!');
+  }
+};
+
+// get tour details 
+exports.deleteTour = deleteTour;
+const getTour = async id => {
+  try {
+    const res = await _axios.default.get("/api/v1/tours/admin/".concat(id));
+    return res.data.data.data;
+  } catch (err) {
+    (0, _alerts.showAlert)('error', 'Error get tour details');
+    throw err;
+  }
+};
+
+// create new tour 
+exports.getTour = getTour;
+const createTour = async formData => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'post',
+      url: '/api/v1/tours',
+      data: formData
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Tour created successfully!');
+      window.setTimeout(() => location.reload(), 1000);
+    }
+  } catch (err) {
+    var _err$response;
+    (0, _alerts.showAlert)('error', ((_err$response = err.response) === null || _err$response === void 0 || (_err$response = _err$response.data) === null || _err$response === void 0 ? void 0 : _err$response.message) || 'Error creating tour');
+  }
+};
+
+// edit tour 
+exports.createTour = createTour;
+const updateTour = async (tourId, formData) => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'patch',
+      url: "/api/v1/tours/".concat(tourId),
+      data: formData
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Tour edited successfully!');
+      window.setTimeout(() => location.reload(), 1000);
+    }
+  } catch (err) {
+    var _err$response2;
+    (0, _alerts.showAlert)('error', ((_err$response2 = err.response) === null || _err$response2 === void 0 || (_err$response2 = _err$response2.data) === null || _err$response2 === void 0 ? void 0 : _err$response2.message) || 'Error editing tour');
+  }
+};
+exports.updateTour = updateTour;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"manageTourModel.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.initCreateTourModal = void 0;
+var _manageTour = require("./manageTour");
+const initCreateTourModal = () => {
+  const overlay = document.getElementById('create-tour-overlay');
+  if (!overlay) return;
+  const openCreateBtn = document.getElementById('open-create-tour');
+  const closeBtn = document.getElementById('close-create-tour');
+  const cancelBtn = document.getElementById('cancel-create-tour');
+  const form = document.getElementById('create-tour-form');
+  const modalTitle = document.getElementById('ct-modal-title');
+  const submitBtn = document.getElementById('ct-submit-btn');
+  const locationsWrap = document.getElementById('ct-locations');
+  const datesWrap = document.getElementById('ct-dates');
+  const imageCoverInput = document.getElementById('ct-imageCover');
+  const openModal = () => {
+    overlay.classList.add('ct-overlay--open');
+    document.body.style.overflow = 'hidden';
+  };
+  const closeModal = () => {
+    overlay.classList.remove('ct-overlay--open');
+    document.body.style.overflow = '';
+  };
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('ct-overlay--open')) closeModal();
+  });
+
+  // ---- Dynamic itinerary location rows ----
+  const addLocationRow = function () {
+    var _data$lng, _data$lat;
+    let data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    const row = document.createElement('div');
+    row.className = 'ct-location-row';
+    row.innerHTML = "\n      <input type=\"text\" class=\"form__input ct-loc-description\" placeholder=\"Description\" value=\"".concat(data.description || '', "\">\n      <input type=\"number\" class=\"form__input ct-loc-day\" placeholder=\"Day\" min=\"1\" style=\"max-width:80px;\" value=\"").concat(data.day || '', "\">\n      <input type=\"number\" step=\"any\" class=\"form__input ct-loc-lng\" placeholder=\"Longitude\" style=\"max-width:120px;\" value=\"").concat((_data$lng = data.lng) !== null && _data$lng !== void 0 ? _data$lng : '', "\">\n      <input type=\"number\" step=\"any\" class=\"form__input ct-loc-lat\" placeholder=\"Latitude\" style=\"max-width:120px;\" value=\"").concat((_data$lat = data.lat) !== null && _data$lat !== void 0 ? _data$lat : '', "\">\n      <button type=\"button\" class=\"ct-remove-btn\">&times;</button>\n    ");
+    row.querySelector('.ct-remove-btn').addEventListener('click', () => row.remove());
+    locationsWrap.appendChild(row);
+  };
+  document.getElementById('ct-add-location').addEventListener('click', () => addLocationRow());
+
+  // ---- Dynamic start date rows ----
+  const addDateRow = function () {
+    let value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    const row = document.createElement('div');
+    row.className = 'ct-date-row';
+    row.innerHTML = "\n      <input type=\"date\" class=\"form__input ct-date-input\" value=\"".concat(value, "\">\n      <button type=\"button\" class=\"ct-remove-btn\">&times;</button>\n    ");
+    row.querySelector('.ct-remove-btn').addEventListener('click', () => row.remove());
+    datesWrap.appendChild(row);
+  };
+  document.getElementById('ct-add-date').addEventListener('click', () => addDateRow());
+
+  // ---- Reset form ----
+  const resetForm = () => {
+    form.reset();
+    form.dataset.mode = 'create';
+    delete form.dataset.tourId;
+    modalTitle.textContent = 'Create New Tour';
+    submitBtn.textContent = 'Create Tour';
+    imageCoverInput.required = true;
+    locationsWrap.innerHTML = '';
+    datesWrap.innerHTML = '';
+    addLocationRow();
+    addDateRow();
+    form.querySelectorAll('input[name="guides[]"]').forEach(cb => cb.checked = false);
+  };
+  openCreateBtn.addEventListener('click', () => {
+    resetForm();
+    openModal();
+  });
+
+  // ---- Fill form for editing ----
+  const fillEditForm = tour => {
+    form.dataset.mode = 'edit';
+    form.dataset.tourId = tour.id || tour._id;
+    modalTitle.textContent = "Edit Tour \u2014 ".concat(tour.name);
+    submitBtn.textContent = 'Save Changes';
+    imageCoverInput.required = false;
+    form.name.value = tour.name || '';
+    form.duration.value = tour.duration || '';
+    form.maxGroupSize.value = tour.maxGroupSize || '';
+    form.difficulty.value = tour.difficulty || 'medium';
+    form.price.value = tour.price || '';
+    form.summary.value = tour.summary || '';
+    form.description.value = tour.description || '';
+    form.secretTour.checked = !!tour.secretTour;
+    const sl = tour.startLocation || {};
+    form.startAddress.value = sl.address || '';
+    form.startDescription.value = sl.description || '';
+    form.startLng.value = sl.coordinates ? sl.coordinates[0] : '';
+    form.startLat.value = sl.coordinates ? sl.coordinates[1] : '';
+    locationsWrap.innerHTML = '';
+    (tour.locations || []).forEach(loc => {
+      addLocationRow({
+        description: loc.description,
+        day: loc.day,
+        lng: loc.coordinates ? loc.coordinates[0] : '',
+        lat: loc.coordinates ? loc.coordinates[1] : ''
+      });
+    });
+    if (!locationsWrap.children.length) addLocationRow();
+    datesWrap.innerHTML = '';
+    (tour.startDates || []).forEach(d => {
+      const dateObj = typeof d === 'string' ? d : d.date;
+      addDateRow(dateObj ? dateObj.slice(0, 10) : '');
+    });
+    if (!datesWrap.children.length) addDateRow();
+    const guideIds = (tour.guides || []).map(g => typeof g === 'string' ? g : g._id || g.id);
+    form.querySelectorAll('input[name="guides[]"]').forEach(cb => {
+      cb.checked = guideIds.includes(cb.value);
+    });
+  };
+
+  // ربط الكليك هنا بطريقة صحيحة ومباشرة داخل الـ init
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('.edit-tour-btn');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    console.log('Edit clicked:', id);
+    try {
+      const tour = await (0, _manageTour.getTour)(id);
+      console.log('Tour returned:', tour);
+      if (tour) {
+        resetForm();
+        fillEditForm(tour);
+        openModal();
+      }
+    } catch (err) {
+      console.log('Error fetching tour for edit:', err);
+    }
+  });
+  resetForm();
+
+  // ---- Submit Form (Create or Edit) ----
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const locations = [...locationsWrap.querySelectorAll('.ct-location-row')].filter(row => row.querySelector('.ct-loc-description').value.trim()).map(row => ({
+      type: 'Point',
+      description: row.querySelector('.ct-loc-description').value,
+      day: Number(row.querySelector('.ct-loc-day').value) || 1,
+      coordinates: [Number(row.querySelector('.ct-loc-lng').value) || 0, Number(row.querySelector('.ct-loc-lat').value) || 0]
+    }));
+    const startDates = [...datesWrap.querySelectorAll('.ct-date-input')].map(input => input.value).filter(Boolean).map(date => ({
+      date
+    }));
+    const guides = [...form.querySelectorAll('input[name="guides[]"]:checked')].map(cb => cb.value);
+    const startLocation = {
+      type: 'Point',
+      address: form.startAddress.value,
+      description: form.startDescription.value,
+      coordinates: [Number(form.startLng.value), Number(form.startLat.value)]
+    };
+    const formData = new FormData();
+    formData.append('name', form.name.value);
+    formData.append('duration', form.duration.value);
+    formData.append('maxGroupSize', form.maxGroupSize.value);
+    formData.append('difficulty', form.difficulty.value);
+    formData.append('price', form.price.value);
+    formData.append('summary', form.summary.value);
+    formData.append('description', form.description.value);
+    formData.append('secretTour', form.secretTour.checked);
+    formData.append('startLocation', JSON.stringify(startLocation));
+    formData.append('locations', JSON.stringify(locations));
+    formData.append('startDates', JSON.stringify(startDates));
+    formData.append('guides', JSON.stringify(guides));
+    if (form.imageCover.files[0]) formData.append('imageCover', form.imageCover.files[0]);
+    [...form.images.files].forEach(file => formData.append('images', file));
+    const isEdit = form.dataset.mode === 'edit';
+    if (isEdit) {
+      await (0, _manageTour.updateTour)(form.dataset.tourId, formData);
+    } else {
+      await (0, _manageTour.createTour)(formData);
+    }
+  });
+};
+exports.initCreateTourModal = initCreateTourModal;
+},{"./manageTour":"manageTour.js"}],"manageUser.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateUser = exports.deleteUser = exports.createUser = void 0;
+var _axios = _interopRequireDefault(require("axios"));
+var _alerts = require("./alerts");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+// delete
+
+const deleteUser = async userId => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'DELETE',
+      url: "/api/v1/users/".concat(userId)
+    });
+    if (res.status === 204) {
+      (0, _alerts.showAlert)('success', 'User deleted successfully!');
+      window.setTimeout(() => {
+        location.reload(); // إعادة تحميل الصفحة عشان الجدول يتحدث
+      }, 1000);
+    }
+  } catch (err) {
+    var _err$response;
+    (0, _alerts.showAlert)('error', ((_err$response = err.response) === null || _err$response === void 0 || (_err$response = _err$response.data) === null || _err$response === void 0 ? void 0 : _err$response.message) || 'Error deleting user!');
+  }
+};
+
+// create new user
+exports.deleteUser = deleteUser;
+const createUser = async formData => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'POST',
+      url: '/api/v1/users',
+      data: formData
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'User created successfully!');
+      window.setTimeout(() => location.reload(), 1000);
+    }
+  } catch (err) {
+    var _err$response2;
+    (0, _alerts.showAlert)('error', ((_err$response2 = err.response) === null || _err$response2 === void 0 || (_err$response2 = _err$response2.data) === null || _err$response2 === void 0 ? void 0 : _err$response2.message) || 'Error creating user');
+  }
+};
+
+// edit user
+exports.createUser = createUser;
+const updateUser = async (userId, formData) => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'PATCH',
+      url: "/api/v1/users/".concat(userId),
+      data: formData
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'User edited successfully!');
+      window.setTimeout(() => location.reload(), 1000);
+    }
+  } catch (err) {
+    var _err$response3;
+    (0, _alerts.showAlert)('error', ((_err$response3 = err.response) === null || _err$response3 === void 0 || (_err$response3 = _err$response3.data) === null || _err$response3 === void 0 ? void 0 : _err$response3.message) || 'Error editing user');
+  }
+};
+exports.updateUser = updateUser;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"confirmModal.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.showConfirmModal = void 0;
+// Reusable, Promise-based confirm modal — replaces the native window.confirm().
+// Builds its own markup on demand, so it can be called from any page/module
+// without needing static HTML added to every pug file.
+//
+// Usage:
+//   const ok = await showConfirmModal({
+//     title: 'Delete Tour',
+//     message: 'Are you sure you want to delete this tour? This action cannot be undone.',
+//     confirmText: 'Delete'
+//   });
+//   if (ok) { ...proceed... }
+
+const showConfirmModal = function () {
+  let _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+    _ref$title = _ref.title,
+    title = _ref$title === void 0 ? 'Are you sure?' : _ref$title,
+    _ref$message = _ref.message,
+    message = _ref$message === void 0 ? 'This action cannot be undone.' : _ref$message,
+    _ref$confirmText = _ref.confirmText,
+    confirmText = _ref$confirmText === void 0 ? 'Delete' : _ref$confirmText,
+    _ref$cancelText = _ref.cancelText,
+    cancelText = _ref$cancelText === void 0 ? 'Cancel' : _ref$cancelText;
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'cf-overlay';
+    overlay.innerHTML = "\n      <div class=\"cf-modal\" role=\"alertdialog\" aria-modal=\"true\">\n        <div class=\"cf-icon\">!</div>\n        <h3 class=\"cf-title\">".concat(title, "</h3>\n        <p class=\"cf-message\">").concat(message, "</p>\n        <div class=\"cf-actions\">\n          <button type=\"button\" class=\"cf-btn-cancel\">").concat(cancelText, "</button>\n          <button type=\"button\" class=\"cf-btn-confirm\">").concat(confirmText, "</button>\n        </div>\n      </div>\n    ");
+    document.body.appendChild(overlay);
+    console.log('CONFIRM MODAL CREATED');
+    console.log(overlay);
+    document.body.style.overflow = 'hidden';
+
+    // trigger the open transition on the next frame
+    requestAnimationFrame(() => overlay.classList.add('cf-overlay--open'));
+    console.log('MODAL OPEN CLASS ADDED');
+    const cleanup = result => {
+      overlay.classList.remove('cf-overlay--open');
+      document.body.style.overflow = '';
+      setTimeout(() => overlay.remove(), 200);
+      document.removeEventListener('keydown', onKeydown);
+      resolve(result);
+    };
+    const onKeydown = e => {
+      if (e.key === 'Escape') cleanup(false);
+      if (e.key === 'Enter') cleanup(true);
+    };
+    overlay.querySelector('.cf-btn-cancel').addEventListener('click', () => cleanup(false));
+    overlay.querySelector('.cf-btn-confirm').addEventListener('click', () => cleanup(true));
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) cleanup(false);
+    });
+    document.addEventListener('keydown', onKeydown);
+  });
+};
+exports.showConfirmModal = showConfirmModal;
+},{}],"manageUserModel.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.initCreateUserModal = void 0;
+var _manageUser = require("./manageUser");
+var _confirmModal = require("./confirmModal");
+const initCreateUserModal = () => {
+  const overlay = document.getElementById('create-user-overlay');
+  if (!overlay) return;
+  const openCreateBtn = document.getElementById('open-create-user');
+  const closeBtn = document.getElementById('close-create-user');
+  const cancelBtn = document.getElementById('cancel-create-user');
+  const form = document.getElementById('create-user-form');
+  const modalTitle = document.getElementById('cu-modal-title');
+  const submitBtn = document.getElementById('cu-submit-btn');
+  const passwordInput = document.getElementById('cu-password');
+  const passwordConfirmInput = document.getElementById('cu-password-confirm');
+  const passwordHint = document.getElementById('cu-password-hint');
+  const activeInput = document.getElementById('cu-active');
+  const openModal = () => {
+    overlay.classList.add('ct-overlay--open');
+    document.body.style.overflow = 'hidden';
+  };
+  const closeModal = () => {
+    overlay.classList.remove('ct-overlay--open');
+    document.body.style.overflow = '';
+  };
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('ct-overlay--open')) closeModal();
+  });
+
+  // ---- Reset form ----
+  const resetForm = () => {
+    form.reset();
+    form.dataset.mode = 'create';
+    delete form.dataset.userId;
+    modalTitle.textContent = 'Create New User';
+    submitBtn.textContent = 'Create User';
+    passwordInput.required = true;
+    passwordHint.style.display = 'none';
+    activeInput.checked = true;
+  };
+  openCreateBtn.addEventListener('click', () => {
+    resetForm();
+    openModal();
+  });
+
+  // ---- Fill form for editing ----
+  const fillEditForm = data => {
+    console.log('EDIT USER DATA:', data);
+    console.log('ACTIVE VALUE:', data.active);
+    console.log('ACTIVE TYPE:', typeof data.active);
+    form.dataset.mode = 'edit';
+    form.dataset.userId = data.id;
+    ////
+    const idInput = document.getElementById('cu-id');
+    if (idInput) idInput.value = data.id;
+    modalTitle.textContent = "Edit User \u2014 ".concat(data.name);
+    submitBtn.textContent = 'Save Changes';
+    passwordInput.required = false;
+    passwordHint.style.display = 'block';
+    form.name.value = data.name || '';
+    form.email.value = data.email || '';
+    form.role.value = data.role || 'user';
+    activeInput.checked = data.active === 'true' || data.active === true;
+  };
+  document.addEventListener('click', async e => {
+    const editBtn = e.target.closest('.edit-user-btn');
+    if (editBtn) {
+      console.log('BUTTON:', editBtn);
+      console.log('DATASET:', editBtn.dataset);
+      console.log('ACTIVE FROM BUTTON:', editBtn.dataset.active);
+      resetForm();
+      fillEditForm({
+        id: editBtn.dataset.id,
+        name: editBtn.dataset.name,
+        email: editBtn.dataset.email,
+        role: editBtn.dataset.role,
+        active: editBtn.dataset.active
+      });
+      openModal();
+      return;
+    }
+    const deleteBtn = e.target.closest('.delete-user-btn');
+    if (deleteBtn) {
+      const id = deleteBtn.dataset.id;
+      const confirmed = await (0, _confirmModal.showConfirmModal)({
+        title: 'Delete User',
+        message: 'Are you sure you want to delete this user? This action cannot be undone.',
+        confirmText: 'Delete'
+      });
+      if (confirmed) {
+        (0, _manageUser.deleteUser)(id);
+      }
+    }
+  });
+  resetForm();
+
+  // ---- Submit Form (Create or Edit) ----
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('name', form.name.value);
+    formData.append('email', form.email.value);
+    formData.append('role', form.role.value);
+    formData.append('active', activeInput.checked);
+    console.log('ACTIVE CHECKED:', activeInput.checked);
+    console.log('ACTIVE FORMDATA:', formData.get('active'));
+    if (passwordInput.value) formData.append('password', passwordInput.value);
+    if (passwordConfirmInput.value) formData.append('passwordConfirm', passwordConfirmInput.value);
+    if (form.photo.files[0]) formData.append('photo', form.photo.files[0]);
+    const isEdit = form.dataset.mode === 'edit';
+    if (isEdit) {
+      ////
+      const userId = form.dataset.userId || document.getElementById('cu-id').value;
+      console.log('Updating user with ID:', userId);
+      await (0, _manageUser.updateUser)(userId, formData);
+    } else {
+      await (0, _manageUser.createUser)(formData);
+    }
+  });
+};
+exports.initCreateUserModal = initCreateUserModal;
+},{"./manageUser":"manageUser.js","./confirmModal":"confirmModal.js"}],"manageBooking.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.deleteBooking = void 0;
+var _axios = _interopRequireDefault(require("axios"));
+var _alerts = require("./alerts");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const deleteBooking = async bookingId => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'DELETE',
+      url: "/api/v1/bookings/".concat(bookingId)
+    });
+    if (res.status === 204) {
+      (0, _alerts.showAlert)('success', 'Booking deleted successfully!');
+      window.setTimeout(() => {
+        location.reload(); // الجدول يتحدث
+      }, 1000);
+    }
+  } catch (err) {
+    var _err$response;
+    (0, _alerts.showAlert)('error', ((_err$response = err.response) === null || _err$response === void 0 || (_err$response = _err$response.data) === null || _err$response === void 0 ? void 0 : _err$response.message) || 'Error deleting booking!');
+  }
+};
+exports.deleteBooking = deleteBooking;
 },{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -7400,6 +7999,12 @@ var _updateSetting = require("./updateSetting");
 var _stripe = require("./stripe");
 var _alerts = require("./alerts");
 var _reviewForm = require("./reviewForm");
+var _manageAccountReview = require("./manageAccountReview");
+var _manageTour = require("./manageTour");
+var _manageTourModel = require("./manageTourModel");
+var _manageUserModel = require("./manageUserModel");
+var _manageBooking = require("./manageBooking");
+var _confirmModal = require("./confirmModal");
 // Dom element 
 
 const loginForm = document.querySelector('.form--login');
@@ -7407,9 +8012,25 @@ const signupForm = document.querySelector('.form--signup');
 const mapBox = document.getElementById('map');
 const logoutButton = document.querySelector('.nav__el--logout');
 const reviewForm = document.querySelector('.form--review');
+
+// account reviews (edit/delete)
+const editReviewBtns = document.querySelectorAll('.edit-review-btn');
+const deleteReviewBtns = document.querySelectorAll('.delete-review-btn');
+const editReviewOverlay = document.getElementById('edit-review-overlay');
+const editReviewForm = document.getElementById('edit-review-form');
+const editReviewTextInput = document.getElementById('edit-review-text');
+const editReviewRatingInput = document.getElementById('edit-review-rating');
+const cancelEditReviewBtn = document.getElementById('cancel-edit-review');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
+const deleteTourBtns = document.querySelectorAll('.delete-tour-btn');
+
+// admin booking 
+const deleteBookingBtns = document.querySelectorAll('.delete-booking-btn');
+const deleteBookingOverlay = document.getElementById('delete-booking-overlay');
+const cancelDeleteBookingBtn = document.getElementById('cancel-delete-booking');
+const confirmDeleteBookingBtn = document.getElementById('confirm-delete-booking');
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
   (0, _mapBox.dispalyMap)(locations);
@@ -7488,7 +8109,130 @@ if (reviewForm) {
     (0, _reviewForm.createReview)(tourId, review, rating);
   });
 }
-},{"./login":"login.js","./mapBox":"mapBox.js","./updateSetting":"updateSetting.js","./stripe":"stripe.js","./alerts":"alerts.js","./reviewForm":"reviewForm.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+if (deleteTourBtns) {
+  deleteTourBtns.forEach(btn => {
+    btn.addEventListener('click', async e => {
+      const tourId = e.target.dataset.id;
+      // confirm create popup for user 
+      const confirmed = await (0, _confirmModal.showConfirmModal)({
+        title: 'Delete Tour',
+        message: 'Are you sure you want to delete this tour? This action cannot be undone.',
+        confirmText: 'Delete'
+      });
+      if (confirmed) (0, _manageTour.deleteTour)(tourId);
+    });
+  });
+}
+
+// account reviews: edit
+let reviewIdToEdit = null;
+try {
+  if (editReviewBtns.length && editReviewOverlay && editReviewForm && cancelEditReviewBtn && editReviewTextInput && editReviewRatingInput) {
+    // دالة لتحديث شكل ولون النجوم بصرياً
+    const updateStarRatingUI = ratingValue => {
+      const starContainer = editReviewForm.querySelector('.star-rating');
+      if (!starContainer) return;
+      const stars = starContainer.querySelectorAll('.star');
+      stars.forEach(star => {
+        const starVal = parseInt(star.getAttribute('data-value'));
+        if (starVal <= ratingValue) {
+          star.style.color = '#ffc107'; // أصفر للنجوم المختارة
+        } else {
+          star.style.color = '#e4e5e9'; // رمادي للباقي
+        }
+      });
+    };
+
+    // تفعيل الضغط على النجوم باستخدام Event Delegation
+    const starContainer = editReviewForm.querySelector('.star-rating');
+    if (starContainer) {
+      starContainer.addEventListener('click', e => {
+        const star = e.target.closest('.star');
+        if (!star) return;
+        const val = star.getAttribute('data-value');
+        editReviewRatingInput.value = val;
+        updateStarRatingUI(val);
+      });
+    }
+    editReviewBtns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        reviewIdToEdit = e.currentTarget.dataset.id;
+        editReviewTextInput.value = e.currentTarget.dataset.review;
+        const currentRating = e.currentTarget.dataset.rating;
+        editReviewRatingInput.value = currentRating;
+        updateStarRatingUI(currentRating);
+        editReviewOverlay.classList.add('review-edit-overlay--open');
+      });
+    });
+    cancelEditReviewBtn.addEventListener('click', () => {
+      reviewIdToEdit = null;
+      editReviewOverlay.classList.remove('review-edit-overlay--open');
+    });
+    editReviewForm.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!reviewIdToEdit) return;
+      (0, _manageAccountReview.updateReview)(reviewIdToEdit, editReviewTextInput.value, editReviewRatingInput.value);
+      editReviewOverlay.classList.remove('review-edit-overlay--open');
+    });
+  } else if (editReviewBtns.length) {
+    console.warn('Edit review UI: some elements are missing, edit disabled.', {
+      editReviewOverlay,
+      editReviewForm,
+      cancelEditReviewBtn,
+      editReviewTextInput,
+      editReviewRatingInput
+    });
+  }
+} catch (err) {
+  console.error('Edit review init error:', err);
+}
+
+// account reviews: delete
+try {
+  if (deleteReviewBtns.length) {
+    deleteReviewBtns.forEach(btn => {
+      btn.addEventListener('click', async e => {
+        const reviewId = e.currentTarget.dataset.id;
+        try {
+          const confirmed = await (0, _confirmModal.showConfirmModal)({
+            title: 'Delete Review',
+            message: 'Are you sure you want to delete this review? This action cannot be undone.',
+            confirmText: 'Delete'
+          });
+          if (confirmed) (0, _manageAccountReview.deleteReview)(reviewId);
+        } catch (err) {
+          console.error('showConfirmModal error:', err);
+        }
+      });
+    });
+  }
+} catch (err) {
+  console.error('Delete review init error:', err);
+}
+(0, _manageTourModel.initCreateTourModal)();
+(0, _manageUserModel.initCreateUserModal)();
+
+// create booking model
+let bookingIdToDelete = null;
+if (deleteBookingBtns.length) {
+  deleteBookingBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      bookingIdToDelete = btn.dataset.id;
+      deleteBookingOverlay.classList.add('cf-overlay--open'); // ⚠️ حطي هنا نفس الكلاس/الطريقة اللي بتفتحي بيها overlay الـ tour
+    });
+  });
+  cancelDeleteBookingBtn.addEventListener('click', () => {
+    bookingIdToDelete = null;
+    deleteBookingOverlay.classList.remove('cf-overlay--open');
+  });
+  confirmDeleteBookingBtn.addEventListener('click', () => {
+    if (bookingIdToDelete) {
+      (0, _manageBooking.deleteBooking)(bookingIdToDelete);
+      deleteBookingOverlay.classList.remove('cf-overlay--open');
+    }
+  });
+}
+},{"./login":"login.js","./mapBox":"mapBox.js","./updateSetting":"updateSetting.js","./stripe":"stripe.js","./alerts":"alerts.js","./reviewForm":"reviewForm.js","./manageAccountReview":"manageAccountReview.js","./manageTour":"manageTour.js","./manageTourModel":"manageTourModel.js","./manageUserModel":"manageUserModel.js","./manageBooking":"manageBooking.js","./confirmModal":"confirmModal.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -7513,7 +8257,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64767" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50721" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

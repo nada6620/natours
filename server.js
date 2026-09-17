@@ -22,10 +22,10 @@ mongoose
   });
 
 // 4) Start server
-// const port = process.env.PORT || 3000;
-// const server = app.listen(port, () => {
-//   console.log(`App running on port ${port}...`);
-// });
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`App running on port ${port}...`);
+});
 
 
 // unhandledRejection error  => فانكشن بتهندل الايرور اللي بتيجي من السيستم نفسه يعني مثلا حصل مشكله في connect moongoDB

@@ -15,7 +15,7 @@ const multerFilter = (req,file,cb)=>{
   if(file.mimetype.startsWith('image')){
     cb(null,true)
   }else{
-    cb(new appError('Not an image! Please upload only images.', 400),false)
+    cb(new APPError('Not an image! Please upload only images.', 400),false)
   }
 }
 const upload = multer({
@@ -28,34 +28,49 @@ const uploadTourImages = upload.fields([
   {name:'images',maxCount:3}
 ]);
 
-const resizeTourImages = async (req,res,next)=>{
-    if(!req.files.imageCover||!req.files.images) return next();
+const resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files) return next();
 
-    //imageCover
-    req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  if (req.files.imageCover) {
+    req.body.imageCover = `tour-${Date.now()}-cover.jpeg`;
 
     await sharp(req.files.imageCover[0].buffer)
-    .resize(2000, 1333)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/tours/${req.body.imageCover}`);
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${req.body.imageCover}`);
+  }
 
+  if (req.files.images && req.files.images.length) {
     req.body.images = [];
     await Promise.all(
-      req.files.images.map(async (file,i)=>{
-         const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
-               await sharp(file.buffer)
-        .resize(2000, 1333)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`public/img/tours/${filename}`);
-
+      req.files.images.map(async (file, i) => {
+        const filename = `tour-${Date.now()}-${i + 1}.jpeg`;
+        await sharp(file.buffer)
+          .resize(2000, 1333)
+          .toFormat('jpeg')
+          .jpeg({ quality: 90 })
+          .toFile(`public/img/tours/${filename}`);
         req.body.images.push(filename);
       })
-    )
-    
+    );
+  }
+
   next();
-}
+});
+
+const parseTourNestedFields = (req, res, next) => {
+  ['startLocation', 'locations', 'startDates', 'guides'].forEach(field => {
+    if (req.body[field] && typeof req.body[field] === 'string') {
+      try {
+        req.body[field] = JSON.parse(req.body[field]);
+      } catch (err) {
+        return next(new APPError(`Invalid ${field} format`, 400));
+      }
+    }
+  });
+  next();
+};
 
 const aliasTopTour = (req,res,next)=>{
 
@@ -72,6 +87,22 @@ const createTour = factory.createOne(TourSchema);
 const getTour = factory.getOne(TourSchema,'Review')
 const updateTour = factory.updateOne(TourSchema)
 const deleteTour = factory.deleteOne(TourSchema)
+
+ const getTourForAdmin =catchAsync(async (req, res, next) => {
+  const tour = await TourSchema.findById(req.params.id)
+  .setOptions({includeSecretTours: true })
+  .populate('guides');
+
+
+  if (!tour) {
+    return next(new APPError('No tour found with that ID', 404));
+  }
+
+    res.status(200).json({
+    status: 'success',
+    data: { data: tour }
+  });
+ });
 
 const getTourStats = catchAsync (async (req, res,next) => {
  
@@ -210,5 +241,5 @@ const getDistance = catchAsync (async (req, res,next) => {
 
 
 module.exports = {
-  deleteTour, updateTour, getTour, createTour, getAllTours,aliasTopTour , getTourStats,getMonyhlyPlan,getToursWithin,getDistance,uploadTourImages,resizeTourImages
+  deleteTour, updateTour, getTour,getTourForAdmin, createTour, getAllTours,aliasTopTour , getTourStats,getMonyhlyPlan,getToursWithin,getDistance,uploadTourImages,resizeTourImages,parseTourNestedFields
 };

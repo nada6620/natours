@@ -48,8 +48,8 @@ const uploadUserPhoto = upload.single('photo');
 const resizeUserPhoto = async (req,res,next)=>{
 
   if(!req.file) return next()
-
-  req.file.filename = `user-${req.user.id}-${Date.now()}`;
+ const targetId = req.params.id || req.user.id;
+  req.file.filename = `user-${targetId}-${Date.now()}`;
   const buffer= await sharp(req.file.buffer)
   .resize(500,500)
   .toFormat('jpeg')
@@ -66,6 +66,7 @@ const resizeUserPhoto = async (req,res,next)=>{
   })
 
   req.file.filename =result.secure_url;
+  req.body.photo = req.file.filename;
   next();
 }
 
@@ -83,12 +84,10 @@ const getAllUsers = factory.getAll(userSchema)
 
 const getUser = factory.getOne(userSchema)
 
-const createUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
+const createUser = factory.createOne(userSchema)
+// do not update password
+const updateUser = factory.updateOne(userSchema)
+const deleteUser = factory.deleteOne(userSchema)
 
 const getMe = catchAsync(async(req, res,next) => {
 req.params.id = req.user.id
@@ -128,9 +127,7 @@ const deleteMe =catchAsync(async(req, res,next) => {
    })
 
 })
-// do not update password
-const updateUser = factory.updateOne(userSchema)
-const deleteUser = factory.deleteOne(userSchema)
+
 
 module.exports = {
   deleteUser, updateUser, createUser, getUser, getAllUsers,updateMe,deleteMe,getMe,uploadUserPhoto,resizeUserPhoto

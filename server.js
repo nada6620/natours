@@ -20,25 +20,45 @@ const DB = process.env.MONGODB_URI.replace(
   '<PASSWORD>',
   encodeURIComponent(process.env.MONGODB_PASSWORD)
 );
-mongoose.connect(DB)
+
+// const port = process.env.PORT || 3000;
+
+// async function startServer() {
+//   try {
+//     console.log('Connecting to MongoDB...');
+
+//     await mongoose.connect(DB);
+
+//     console.log('MongoDB Connected Successfully');
+
+//     const server = app.listen(port, () => {
+//       console.log(`App running on port ${port}...`);
+//     });
+
+//     process.on('SIGTERM', () => {
+//       console.log('SIGTERM RECEIVED');
+//       server.close(() => process.exit(0));
+//     });
+
+//   } catch (err) {
+//     console.error('MongoDB Connection Failed:', err);
+//     process.exit(1);
+//   }
+// }
+
+// startServer();
+
+mongoose
+  .connect(DB)
   .then(() => {
-    console.log('✅ MongoDB Connected Successfully');
-  })
-  .catch(err => {
-    console.error('❌ MongoDB Connection Failed');
-    console.error(err);
+    console.log('DB connection successful!');
   });
-// mongoose
-//   .connect(DB)
-//   .then(() => {
-//     console.log('DB connection successful! 😍 🪢');
-//   });
 
 // 4) Start server
-// const port = process.env.PORT || 3000;
-// const server = app.listen(port, () => {
-//   console.log(`App running on port ${port}...`);
-// });
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`App running on port ${port}...`);
+});
 
 
 // unhandledRejection error  => فانكشن بتهندل الايرور اللي بتيجي من السيستم نفسه يعني مثلا حصل مشكله في connect moongoDB

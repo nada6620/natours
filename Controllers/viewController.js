@@ -13,11 +13,10 @@ exports.alerts = catchAsync(async (req,res,next)=>{
 });
 
 
+
 exports.getOverview = catchAsync(async (req,res)=>{
   console.log('Inside getOverview:', res.locals.user);
   // 1- get all tours 
-  // const tours = await Tour.find();
- 
 const tours = await Tour.find();
  console.log('--- START DATES STRUCTURE ---');
   console.log(JSON.stringify(tours[0].startDates, null, 2));

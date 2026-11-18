@@ -12,8 +12,14 @@ process.on('uncaughtException',err=>{
   process.exit(1);
 }) 
 
+const dns = require('node:dns');
 
-const DB = process.env.MONGODB_URI.replace('<db_password>', process.env.MONGODB_PASSWORD);
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+const DB = process.env.MONGODB_URI.replace(
+  '<PASSWORD>',
+  encodeURIComponent(process.env.MONGODB_PASSWORD)
+);
 
 mongoose
   .connect(DB)

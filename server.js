@@ -20,12 +20,19 @@ const DB = process.env.MONGODB_URI.replace(
   '<PASSWORD>',
   encodeURIComponent(process.env.MONGODB_PASSWORD)
 );
-
-mongoose
-  .connect(DB)
+mongoose.connect(DB)
   .then(() => {
-    console.log('DB connection successful! 😍 🪢');
+    console.log('✅ MongoDB Connected Successfully');
+  })
+  .catch(err => {
+    console.error('❌ MongoDB Connection Failed');
+    console.error(err);
   });
+// mongoose
+//   .connect(DB)
+//   .then(() => {
+//     console.log('DB connection successful! 😍 🪢');
+//   });
 
 // 4) Start server
 // const port = process.env.PORT || 3000;
